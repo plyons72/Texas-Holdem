@@ -4,7 +4,7 @@ Michael Hopwood
 Alex McMullen
 Gary Xu
  */
- 
+
 public class Player
 {
   private int playerMoney;
@@ -13,7 +13,7 @@ public class Player
   public Player()
   {
     playerName = null;
-    playerMoney = 0;
+    playerMoney = 1000;
   }
 
   public Player(String name, int amount)
