@@ -6,11 +6,77 @@ Gary Xu
  */
 
 import java.util.*;
+import java.awt.*;
+import javax.swing.*;
 
 public class TexasHoldem {
 
+    private static final int WINDOW_WIDTH = 800;
+    private static final int WINDOW_HEIGHT = 600;
+
     public static void main(String[] args)
     {
+
+        //initializing window
+        JFrame windowFrame = new JFrame("Texas Holdem");
+        windowFrame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        windowFrame.setVisible(true);
+
+        //initializing panels
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new FlowLayout());
+        topPanel.setBackground(Color.decode("#63d39b"));
+        JPanel middlePanel = new JPanel();
+        middlePanel.setLayout(new FlowLayout());
+        middlePanel.setBackground(Color.decode("#3d9061"));
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout());
+        bottomPanel.setBackground(Color.decode("#336d50"));
+
+        //initializing buttons
+        JButton raiseButton = new JButton("Raise");
+        raiseButton.setVisible(true);
+        raiseButton.setHorizontalAlignment(SwingConstants.LEFT);
+        raiseButton.setVerticalAlignment(SwingConstants.CENTER);
+        JButton callButton = new JButton("Call");
+        callButton.setVisible(true);
+        callButton.setHorizontalAlignment(SwingConstants.LEFT);
+        callButton.setVerticalAlignment(SwingConstants.CENTER);
+        JButton foldButton = new JButton("Fold");
+        foldButton.setVisible(true);
+        foldButton.setHorizontalAlignment(SwingConstants.LEFT);
+        foldButton.setVerticalAlignment(SwingConstants.CENTER);
+
+        //adding buttons to panels
+        middlePanel.add(raiseButton);
+        middlePanel.add(callButton);
+        middlePanel.add(foldButton);
+
+
+        //adding cards to panels
+        BufferedImage exampleCard = ImageIO.read(new File("../../img/cards/queen_of_diamonds.png"));
+        JLabel cardLabel = new JLabel(new ImageIcon(exampleCard));
+        bottomPanel.add(cardLabel);
+        bottomPanel.add(cardLabel);
+        bottomPanel.add(cardLabel);
+        bottomPanel.add(cardLabel);
+        bottomPanel.add(cardLabel);
+        bottomPanel.add(cardLabel);
+        bottomPanel.add(cardLabel);
+        bottomPanel.add(cardLabel);
+        bottomPanel.add(cardLabel);
+
+        //adding panels to frame
+        windowFrame.add(topPanel, BorderLayout.NORTH);
+        windowFrame.add(middlePanel, BorderLayout.CENTER);
+        windowFrame.add(bottomPanel, BorderLayout.SOUTH);
+
+        //update frame
+        windowFrame.setVisible(true);
+
+
+
         TexasHoldem texasHoldem = new TexasHoldem();
         int numCPUs = 0;
 
