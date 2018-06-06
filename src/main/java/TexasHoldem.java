@@ -170,26 +170,22 @@ public class TexasHoldem{
 
         //Array full of a list of names to choose from
         String nameArray[] = {  "Patrick", "Alex", "Michael", "Gary", "Bill",
-                "Luke", "Anakin", "Leia", "Padme", "Lauren",
-                "Emily", "Rachael", "Donald", "Ivanka", "Barack",
-                "Michelle", "Hannah", "Jennifer", "Rebecca", "Lisa",
-                "Dorian", "Kristo", "Drake", "Thomas", "John",
-                "Rita", "Cody", "Sydney", "Madeline", "Teddy",
-                "Leah", "Gina", "Katie", "Debby", "Allison",
-                "Peyton", "Chad", "Carson", "Brett", "Holly",
-                "Charlotte", "Jenny", "Joey", "Matt", "Dave",
-                "Zach", "Conner", "Jocelyn", "Haley", "Trisha",
-                "Kristina", "Renee", "Megan", "Ray", "Ciara",
-                "Morgan", "Krystyn", "Courtney", "Mara", "Erin",
-                "Shaun", "Kyle", "Jocelyn", "Lafawndah", "Danielle",
-                "Caleb", "Alan", "Jimmy", "Brittney", "Will"
+                "Luke", "Anakin", "Leia"
         };
 
         // Fill an array with random integers to use as indices for the name array
         // Check for duplicate values before this
         for (int i = 0; i < indexesSelected.length; i++)
         {
-            indexesSelected[i] = rand.nextInt(nameArray.length);
+            int nameIndex = rand.nextInt(nameArray.length);
+            for(int j = 0; j < i; j++)
+            {
+                if (indexesSelected[j] == nameIndex) {
+                    i--;
+                    continue;
+                }
+            }
+            indexesSelected[i] = nameIndex;
         }
 
         for (int j = 0; j < cpuNames.length; j++)

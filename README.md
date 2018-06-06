@@ -1,2 +1,2 @@
-# COE-1530
+# Texas Holdem
 Software Engineering at the University of Pittsburgh
