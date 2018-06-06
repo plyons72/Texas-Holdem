@@ -17,13 +17,13 @@ import javax.swing.plaf.basic.BasicOptionPaneUI;
 
 public class TexasHoldem{
 
-    private static final int WINDOW_WIDTH = 800;
-    private static final int WINDOW_HEIGHT = 600;
+    private static final int WINDOW_WIDTH = 950;
+    private static final int WINDOW_HEIGHT = 750;
 
     private static String[] cpuNames;
     private static String username;
     private static int numCPUs;
-    private static String img = "../../img/"; // address of the img folder
+    private static String img = "src/img/"; // address of the img folder
     private static Deck deck;
 
     public static void main(String[] args)
@@ -75,6 +75,14 @@ public class TexasHoldem{
         humanPlayerDeck[0] = deck.dealCard();
         humanPlayerDeck[1] = deck.dealCard();
 
+        //deal cards to sharedCards
+        int sharedDeck[] = new int[5];
+        sharedDeck[0] = deck.dealCard();
+        sharedDeck[1] = deck.dealCard();
+        sharedDeck[2] = deck.dealCard();
+        sharedDeck[3] = deck.dealCard();
+        sharedDeck[4] = deck.dealCard();
+
         //initializing window
         JFrame windowFrame = new JFrame("Texas Holdem");
         windowFrame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -91,8 +99,31 @@ public class TexasHoldem{
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new GridLayout(1,numCPUs));
         bottomPanel.setBackground(Color.decode("#336d50"));
+
+        // initializing panel for sharedCards      
+        ImageIcon sharedCard0 = new ImageIcon(img+sharedDeck[0]+".png");
+        ImageIcon sharedCard1 = new ImageIcon(img+sharedDeck[1]+".png");
+        ImageIcon sharedCard2 = new ImageIcon(img+sharedDeck[2]+".png");
+        ImageIcon sharedCard3 = new ImageIcon(img+sharedDeck[3]+".png");
+        ImageIcon sharedCard4 = new ImageIcon(img+sharedDeck[4]+".png");
+
+        // creating JLabel with sharedCards
+        JLabel displaysharedCard0 = new JLabel(sharedCard0);
+        JLabel displaysharedCard1 = new JLabel(sharedCard1);
+        JLabel displaysharedCard2 = new JLabel(sharedCard2);
+        JLabel displaysharedCard3 = new JLabel(sharedCard3);
+        JLabel displaysharedCard4 = new JLabel(sharedCard4);
+
+        // adding sharedCards to topPanel
+        topPanel.add(displaysharedCard0);
+        topPanel.add(displaysharedCard1);
+        topPanel.add(displaysharedCard2);
+        topPanel.add(displaysharedCard3);
+        topPanel.add(displaysharedCard4);
+
         // initializing panel for CPUPlayers
         JPanel[] playerPanel = new JPanel[numCPUs];
+
         // initializing panel for humanPlayer
         JPanel humanPlayerPanel = new JPanel(new BorderLayout());
         ImageIcon humanPlayerCard0 = new ImageIcon(img+humanPlayerDeck[0]+".png");
@@ -108,6 +139,8 @@ public class TexasHoldem{
         humanPlayerPanel.add(humanPlayerName, BorderLayout.NORTH);
         humanPlayerPanel.add(displayHumanCard0, BorderLayout.WEST);
         humanPlayerPanel.add(displayHumanCard1, BorderLayout.EAST);
+
+
 
 
         //initializing buttons
