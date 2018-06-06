@@ -6,6 +6,7 @@ Gary Xu
  */
 
 import java.awt.*;
+import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import javax.imageio.*;
 import java.io.*;
@@ -18,21 +19,19 @@ public class TexasHoldem{
     private static final int WINDOW_WIDTH = 800;
     private static final int WINDOW_HEIGHT = 600;
 
+    private static String[] cpuNames;
+    private static String username;
+    private static int numCPUs;
+    private static String img = "../../img/"; // address of the img folder
+
+
     public static void main(String[] args)
     {
-
-        TexasHoldem texasHoldem = new TexasHoldem();
-        int numCPUs = 0;
-
         boolean validNum = true;
-
-        String[] cpuNames;
-
-        String username;
 
         Scanner scan = new Scanner(System.in);
 
-        System.out.print("Welcome to Texas Holdem! How many oponents would you like to face (between 1 and 7 only): ");
+        System.out.print("Welcome to Texas Holdem! How many opponents would you like to face (between 1 and 7 only): ");
 
         //TODO: Check for non integer input
         //and allow user to continue entering values until they get it right
@@ -48,7 +47,7 @@ public class TexasHoldem{
 
         }while(!validNum);
 
-        cpuNames = texasHoldem.getNames(numCPUs);
+        cpuNames = getNames(numCPUs);
 
         System.out.print("\nWhat is your name?: ");
         username = scan.nextLine();
@@ -56,15 +55,19 @@ public class TexasHoldem{
         System.out.printf("Your name is: %s\n", username);
         System.out.println("Your opponents are: ");
         //For testing purposes only. Just ensures we get names accurately
-        for (String word: cpuNames
-             ) {System.out.printf("%s\n", word);
-
+        for (String word: cpuNames)
+        {
+            System.out.printf("%s\n", word);
         }
+        TexasHoldem texasHoldem = new TexasHoldem();
 
     }
 
     TexasHoldem()
     {
+        // variables
+        int potMoney = 0;
+
         //initializing window
         JFrame windowFrame = new JFrame("Texas Holdem");
         windowFrame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -79,8 +82,11 @@ public class TexasHoldem{
         middlePanel.setLayout(new FlowLayout());
         middlePanel.setBackground(Color.decode("#3d9061"));
         JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new FlowLayout());
+        bottomPanel.setLayout(new GridLayout(1,numCPUs));
         bottomPanel.setBackground(Color.decode("#336d50"));
+        // initializing panel for players
+        JPanel[] playerPanel = new JPanel[numCPUs];
+
 
         //initializing buttons
         JButton raiseButton = new JButton("Raise");
@@ -96,12 +102,45 @@ public class TexasHoldem{
         foldButton.setHorizontalAlignment(SwingConstants.LEFT);
         foldButton.setVerticalAlignment(SwingConstants.CENTER);
 
+        // initializing texts
+        // display amount of money in the pot
+        JLabel potMoneyLabel = new JLabel();
+        potMoneyLabel.setText("POT: $"+potMoney);
+        potMoneyLabel.setVerticalAlignment(SwingConstants.CENTER);
+        potMoneyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        potMoneyLabel.setFont(new Font("Consolas",Font.BOLD,14));
+        potMoneyLabel.setForeground(Color.BLUE);
+        // player names
+        JLabel[] playerNames = new JLabel[cpuNames.length];
+
+
+
         //adding buttons to panels
         middlePanel.add(raiseButton);
         middlePanel.add(callButton);
         middlePanel.add(foldButton);
 
-   		
+   		// adding texts to panel
+        middlePanel.add(potMoneyLabel);
+
+        // add the names of CPUs to playerPanel
+        for(int i = 0; i < numCPUs; i++)
+        {
+            // player card image
+            ImageIcon backOfDeck = new ImageIcon(img+"backOfDeck.png");
+            Image resizeDeck = backOfDeck.getImage();
+            resizeDeck.getScaledInstance(30,30,Image.SCALE_SMOOTH);
+            ImageIcon displayDeck = new ImageIcon(resizeDeck);
+            JLabel playerCardImage = new JLabel(displayDeck);
+
+            playerPanel[i] = new JPanel(new FlowLayout());
+            playerNames[i] = new JLabel(cpuNames[i]);
+            playerPanel[i].add(playerNames[i]);
+            playerPanel[i].add(playerCardImage);
+            bottomPanel.add(playerPanel[i]);
+        }
+
+        /*
         //adding cards to panels
         String IMG_PATH = "src/img/queen_of_diamonds.png";
      	
@@ -125,12 +164,13 @@ public class TexasHoldem{
       	}
       	catch (IOException e) {
         	e.printStackTrace();
-    	}
+    	}   */
 
         //adding panels to frame
         windowFrame.add(topPanel, BorderLayout.NORTH);
         windowFrame.add(middlePanel, BorderLayout.CENTER);
         windowFrame.add(bottomPanel, BorderLayout.SOUTH);
+
 
         //update frame
         windowFrame.setVisible(true);
@@ -158,8 +198,9 @@ public class TexasHoldem{
 
     //Takes in a number of names to return to the user, and returns a string
     // array containing names randomly selected from the table below
+    // ** Changed to a static method
     //TODO: Make sure we get random names
-    public String[] getNames(int numCPU)
+    public static String[] getNames(int numCPU)
     {
         Random rand = new Random();
         boolean dupChecker;
