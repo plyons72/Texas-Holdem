@@ -12,6 +12,7 @@ import javax.imageio.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicOptionPaneUI;
 
 
 public class TexasHoldem{
@@ -23,7 +24,7 @@ public class TexasHoldem{
     private static String username;
     private static int numCPUs;
     private static String img = "../../img/"; // address of the img folder
-
+    private static Deck deck;
 
     public static void main(String[] args)
     {
@@ -59,6 +60,7 @@ public class TexasHoldem{
         {
             System.out.printf("%s\n", word);
         }
+        deck = new Deck();
         TexasHoldem texasHoldem = new TexasHoldem();
 
     }
@@ -67,6 +69,11 @@ public class TexasHoldem{
     {
         // variables
         int potMoney = 0;
+        // deal cards to humanPlayer
+        // can be put into a field of humanPlayer
+        int humanPlayerDeck[] = new int[2];
+        humanPlayerDeck[0] = deck.dealCard();
+        humanPlayerDeck[1] = deck.dealCard();
 
         //initializing window
         JFrame windowFrame = new JFrame("Texas Holdem");
@@ -84,8 +91,23 @@ public class TexasHoldem{
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new GridLayout(1,numCPUs));
         bottomPanel.setBackground(Color.decode("#336d50"));
-        // initializing panel for players
+        // initializing panel for CPUPlayers
         JPanel[] playerPanel = new JPanel[numCPUs];
+        // initializing panel for humanPlayer
+        JPanel humanPlayerPanel = new JPanel(new BorderLayout());
+        ImageIcon humanPlayerCard0 = new ImageIcon(img+humanPlayerDeck[0]+".png");
+        ImageIcon humanPlayerCard1 = new ImageIcon(img+humanPlayerDeck[1]+".png");
+        JLabel displayHumanCard0 = new JLabel(humanPlayerCard0);
+        JLabel displayHumanCard1 = new JLabel(humanPlayerCard1);
+
+
+        JLabel humanPlayerName = new JLabel();
+        humanPlayerName.setText(username);
+        humanPlayerName.setForeground(Color.BLUE);
+        humanPlayerName.setFont(new Font("Consolas",14,Font.BOLD));
+        humanPlayerPanel.add(humanPlayerName, BorderLayout.NORTH);
+        humanPlayerPanel.add(displayHumanCard0, BorderLayout.WEST);
+        humanPlayerPanel.add(displayHumanCard1, BorderLayout.EAST);
 
 
         //initializing buttons
@@ -170,6 +192,7 @@ public class TexasHoldem{
         windowFrame.add(topPanel, BorderLayout.NORTH);
         windowFrame.add(middlePanel, BorderLayout.CENTER);
         windowFrame.add(bottomPanel, BorderLayout.SOUTH);
+        windowFrame.add(humanPlayerPanel, BorderLayout.WEST);
 
 
         //update frame
@@ -245,4 +268,10 @@ public class TexasHoldem{
 
     }
 
+    private static int dealCard()
+    {
+        Random random = new Random();
+        int card = random.nextInt(52) + 1; // the cards' filename starts at 1
+        return card;
+    }
 }
