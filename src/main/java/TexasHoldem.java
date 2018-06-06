@@ -195,31 +195,6 @@ public class TexasHoldem{
             bottomPanel.add(playerPanel[i]);
         }
 
-        /*
-        //adding cards to panels
-        String IMG_PATH = "src/img/queen_of_diamonds.png";
-     	
-     	try {
-        	BufferedImage img = ImageIO.read(new File(IMG_PATH));
-        	ImageIcon icon = new ImageIcon(img);
-        	JLabel cardLabel = new JLabel(icon);
-        	bottomPanel.add(cardLabel);
-      	}
-      	catch (IOException e) {
-        	e.printStackTrace();
-    	}
-
-    	IMG_PATH = "src/img/jack_of_spades.png";
-
-    	try {
-        	BufferedImage img = ImageIO.read(new File(IMG_PATH));
-        	ImageIcon icon = new ImageIcon(img);
-        	JLabel cardLabel = new JLabel(icon);
-        	bottomPanel.add(cardLabel);
-      	}
-      	catch (IOException e) {
-        	e.printStackTrace();
-    	}   */
 
         //adding panels to frame
         windowFrame.add(topPanel, BorderLayout.NORTH);
@@ -233,24 +208,6 @@ public class TexasHoldem{
 
     }
 
-    public static BufferedImage toBufferedImage(Image img)
-    {
-        if (img instanceof BufferedImage)
-        {
-            return (BufferedImage) img;
-        }
-
-        // Create a buffered image with transparency
-        BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-        // Draw the image on to the buffered image
-        Graphics2D bGr = bimage.createGraphics();
-        bGr.drawImage(img, 0, 0, null);
-        bGr.dispose();
-
-        // Return the buffered image
-        return bimage;
-    }
 
     //Takes in a number of names to return to the user, and returns a string
     // array containing names randomly selected from the table below
@@ -270,7 +227,19 @@ public class TexasHoldem{
 
         //Array full of a list of names to choose from
         String nameArray[] = {  "Patrick", "Alex", "Michael", "Gary", "Bill",
-                "Luke", "Anakin", "Leia"
+                "Luke", "Anakin", "Leia", "Padme", "Lauren",
+                "Emily", "Rachael", "Donald", "Ivanka", "Barack",
+                "Michelle", "Hannah", "Jennifer", "Rebecca", "Lisa",
+                "Dorian", "Kristo", "Drake", "Thomas", "John",
+                "Rita", "Cody", "Sydney", "Madeline", "Teddy",
+                "Leah", "Gina", "Katie", "Debby", "Allison",
+                "Peyton", "Chad", "Carson", "Brett", "Holly",
+                "Charlotte", "Jenny", "Joey", "Matt", "Dave",
+                "Zach", "Conner", "Jocelyn", "Haley", "Trisha",
+                "Kristina", "Renee", "Megan", "Ray", "Ciara",
+                "Morgan", "Krystyn", "Courtney", "Mara", "Erin",
+                "Shaun", "Kyle", "Jocelyn", "Lafawndah", "Danielle",
+                "Caleb", "Alan", "Jimmy", "Brittney", "Will"
         };
 
         // Fill an array with random integers to use as indices for the name array
