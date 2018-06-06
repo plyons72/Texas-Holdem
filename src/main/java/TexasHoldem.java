@@ -13,8 +13,6 @@ import java.util.*;
 import javax.swing.*;
 
 
-
-
 public class TexasHoldem{
 
     private static final int WINDOW_WIDTH = 800;
@@ -103,26 +101,31 @@ public class TexasHoldem{
         middlePanel.add(callButton);
         middlePanel.add(foldButton);
 
-        Image _queen_of_diamonds = null;
+   		
         //adding cards to panels
-        try {
-            _queen_of_diamonds = ImageIO.read(getClass().getResource("/queen_of_diamonds.png"));
-        }
-        catch (IOException ioex) {
-            System.exit(1);
-        }
+        String IMG_PATH = "src/img/queen_of_diamonds.png";
+     	
+     	try {
+        	BufferedImage img = ImageIO.read(new File(IMG_PATH));
+        	ImageIcon icon = new ImageIcon(img);
+        	JLabel cardLabel = new JLabel(icon);
+        	bottomPanel.add(cardLabel);
+      	}
+      	catch (IOException e) {
+        	e.printStackTrace();
+    	}
 
-        BufferedImage exampleCard = toBufferedImage(_queen_of_diamonds);
-        JLabel cardLabel = new JLabel(new ImageIcon(exampleCard));
-        bottomPanel.add(cardLabel);
-        bottomPanel.add(cardLabel);
-        bottomPanel.add(cardLabel);
-        bottomPanel.add(cardLabel);
-        bottomPanel.add(cardLabel);
-        bottomPanel.add(cardLabel);
-        bottomPanel.add(cardLabel);
-        bottomPanel.add(cardLabel);
-        bottomPanel.add(cardLabel);
+    	IMG_PATH = "src/img/jack_of_spades.png";
+
+    	try {
+        	BufferedImage img = ImageIO.read(new File(IMG_PATH));
+        	ImageIcon icon = new ImageIcon(img);
+        	JLabel cardLabel = new JLabel(icon);
+        	bottomPanel.add(cardLabel);
+      	}
+      	catch (IOException e) {
+        	e.printStackTrace();
+    	}
 
         //adding panels to frame
         windowFrame.add(topPanel, BorderLayout.NORTH);
