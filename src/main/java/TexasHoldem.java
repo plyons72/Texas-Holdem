@@ -5,12 +5,22 @@ Alex McMullen
 Gary Xu
  */
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.*;
+import java.io.*;
 import java.util.*;
+import javax.swing.*;
 
-public class TexasHoldem {
+
+public class TexasHoldem{
+
+    private static final int WINDOW_WIDTH = 800;
+    private static final int WINDOW_HEIGHT = 600;
 
     public static void main(String[] args)
     {
+
         TexasHoldem texasHoldem = new TexasHoldem();
         int numCPUs = 0;
 
@@ -51,6 +61,99 @@ public class TexasHoldem {
 
         }
 
+    }
+
+    TexasHoldem()
+    {
+        //initializing window
+        JFrame windowFrame = new JFrame("Texas Holdem");
+        windowFrame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        windowFrame.setVisible(true);
+
+        //initializing panels
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new FlowLayout());
+        topPanel.setBackground(Color.decode("#63d39b"));
+        JPanel middlePanel = new JPanel();
+        middlePanel.setLayout(new FlowLayout());
+        middlePanel.setBackground(Color.decode("#3d9061"));
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout());
+        bottomPanel.setBackground(Color.decode("#336d50"));
+
+        //initializing buttons
+        JButton raiseButton = new JButton("Raise");
+        raiseButton.setVisible(true);
+        raiseButton.setHorizontalAlignment(SwingConstants.LEFT);
+        raiseButton.setVerticalAlignment(SwingConstants.CENTER);
+        JButton callButton = new JButton("Call");
+        callButton.setVisible(true);
+        callButton.setHorizontalAlignment(SwingConstants.LEFT);
+        callButton.setVerticalAlignment(SwingConstants.CENTER);
+        JButton foldButton = new JButton("Fold");
+        foldButton.setVisible(true);
+        foldButton.setHorizontalAlignment(SwingConstants.LEFT);
+        foldButton.setVerticalAlignment(SwingConstants.CENTER);
+
+        //adding buttons to panels
+        middlePanel.add(raiseButton);
+        middlePanel.add(callButton);
+        middlePanel.add(foldButton);
+
+   		
+        //adding cards to panels
+        String IMG_PATH = "src/img/queen_of_diamonds.png";
+     	
+     	try {
+        	BufferedImage img = ImageIO.read(new File(IMG_PATH));
+        	ImageIcon icon = new ImageIcon(img);
+        	JLabel cardLabel = new JLabel(icon);
+        	bottomPanel.add(cardLabel);
+      	}
+      	catch (IOException e) {
+        	e.printStackTrace();
+    	}
+
+    	IMG_PATH = "src/img/jack_of_spades.png";
+
+    	try {
+        	BufferedImage img = ImageIO.read(new File(IMG_PATH));
+        	ImageIcon icon = new ImageIcon(img);
+        	JLabel cardLabel = new JLabel(icon);
+        	bottomPanel.add(cardLabel);
+      	}
+      	catch (IOException e) {
+        	e.printStackTrace();
+    	}
+
+        //adding panels to frame
+        windowFrame.add(topPanel, BorderLayout.NORTH);
+        windowFrame.add(middlePanel, BorderLayout.CENTER);
+        windowFrame.add(bottomPanel, BorderLayout.SOUTH);
+
+        //update frame
+        windowFrame.setVisible(true);
+
+    }
+
+    public static BufferedImage toBufferedImage(Image img)
+    {
+        if (img instanceof BufferedImage)
+        {
+            return (BufferedImage) img;
+        }
+
+        // Create a buffered image with transparency
+        BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        // Draw the image on to the buffered image
+        Graphics2D bGr = bimage.createGraphics();
+        bGr.drawImage(img, 0, 0, null);
+        bGr.dispose();
+
+        // Return the buffered image
+        return bimage;
     }
 
     //Takes in a number of names to return to the user, and returns a string
