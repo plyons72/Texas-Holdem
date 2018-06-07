@@ -52,14 +52,7 @@ public class TexasHoldem{
 
         System.out.print("\nWhat is your name?: ");
         username = scan.nextLine();
-
-        System.out.printf("Your name is: %s\n", username);
-        System.out.println("Your opponents are: ");
-        //For testing purposes only. Just ensures we get names accurately
-        for (String word: cpuNames)
-        {
-            System.out.printf("%s\n", word);
-        }
+        
         deck = new Deck();
         TexasHoldem texasHoldem = new TexasHoldem();
 
