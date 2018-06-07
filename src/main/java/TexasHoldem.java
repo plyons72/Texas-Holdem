@@ -223,7 +223,7 @@ public class TexasHoldem{
 
         // Will hold the indexes of the name array we've selected already so that we can reference
         // names we've already chosen
-        int indexesSelected [] = new int[numCPU];
+        ArrayList<Integer> indexesSelected = new ArrayList<Integer>();
 
         //Array full of a list of names to choose from
         String nameArray[] = {  "Patrick", "Alex", "Michael", "Gary", "Bill",
@@ -244,22 +244,19 @@ public class TexasHoldem{
 
         // Fill an array with random integers to use as indices for the name array
         // Check for duplicate values before this
-        for (int i = 0; i < indexesSelected.length; i++)
+        for (int i = 0; i < numCPU; i++)
         {
-            int nameIndex = rand.nextInt(nameArray.length);
-            for(int j = 0; j < i; j++)
+            int temp = rand.nextInt(nameArray.length);
+            while (indexesSelected.contains(temp))
             {
-                if (indexesSelected[j] == nameIndex) {
-                    i--;
-                    continue;
-                }
+                temp = rand.nextInt(nameArray.length);
             }
-            indexesSelected[i] = nameIndex;
+            indexesSelected.add(temp);
         }
 
         for (int j = 0; j < cpuNames.length; j++)
         {
-            cpuNames[j] = nameArray[indexesSelected[j]];
+            cpuNames[j] = nameArray[indexesSelected.get(j)];
         }
 
         return cpuNames;
