@@ -134,8 +134,6 @@ public class TexasHoldem{
         humanPlayerPanel.add(displayHumanCard1, BorderLayout.EAST);
 
 
-
-
         //initializing buttons
         JButton raiseButton = new JButton("Raise");
         raiseButton.setVisible(true);
@@ -160,7 +158,6 @@ public class TexasHoldem{
         potMoneyLabel.setForeground(Color.BLUE);
         // player names
         JLabel[] playerNames = new JLabel[cpuNames.length];
-
 
 
         //adding buttons to panels
@@ -202,9 +199,9 @@ public class TexasHoldem{
     }
 
 
-    //Takes in a number of names to return to the user, and returns a string
+    // akes in a number of names to return to the user, and returns a string
     // array containing names randomly selected from the table below
-    // ** Changed to a static method
+
     //TODO: Make sure we get random names
     public static String[] getNames(int numCPU)
     {

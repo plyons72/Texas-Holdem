@@ -1,3 +1,10 @@
+/*
+Patrick Lyons
+Michael Hopwood
+Alex McMullen
+Gary Xu
+ */
+
 import java.util.*;
 import java.util.List;
 
