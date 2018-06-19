@@ -149,6 +149,31 @@ public class TexasHoldem {
 
     }
 
+    //takes in a CPU player and returns a JLabel array of their resized cards
+    public static JLabel[] getCpuCards(Player cpuPlayer) {
+
+        //get that CPUs cards and make a JLabel array to return
+        int[] cards = cpuPlayer.getCards();
+        JLabel displayCpuCard[] = new JLabel[2];
+
+        ImageIcon cpuCard0 = new ImageIcon(img + cards[0] + ".png");
+        ImageIcon cpuCard1 = new ImageIcon(img + cards[1] + ".png");
+
+        Image resizeCard0 = cpuCard0.getImage();
+        Image resizeCard1 = cpuCard1.getImage();
+        resizeCard0.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        resizeCard1.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        ImageIcon displayCpuCard0 = new ImageIcon(resizeCard0);
+        ImageIcon displayCpuCard1 = new ImageIcon(resizeCard1);
+        JLabel cpuCardImage0 = new JLabel(displayCpuCard0);
+        JLabel cpuCardImage1 = new JLabel(displayCpuCard1);
+
+        displayCpuCard[0] = cpuCardImage0;
+        displayCpuCard[1] = cpuCardImage1;
+
+        return displayCpuCard;
+
+    }
 
     TexasHoldem(int numCPUs, Player player, Player[] cpuPlayer, Dealer dealer) {
 
@@ -264,6 +289,18 @@ public class TexasHoldem {
             playerPanel[i].add(playerNames[i]);
             playerPanel[i].add(playerCardImage);
             bottomPanel.add(playerPanel[i]);
+        }
+
+        //showing all cpu cards
+        for(int i = 0; i < numCPUs; i++) {
+
+            JLabel displayCpuCard[] = new JLabel[2];
+            displayCpuCard = getCpuCards(cpuPlayer[i]);
+
+            playerPanel[i].removeAll();
+            playerPanel[i].add(displayCpuCard[0]);
+            playerPanel[i].add(displayCpuCard[1]);
+
         }
 
 
