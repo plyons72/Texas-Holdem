@@ -33,25 +33,23 @@ public class TexasHoldem {
         // Creates a deck object
         Deck deck = new Deck();
 
-        System.out.print("Welcome to Texas Holdem! How many opponents would you like to face (between 1 and 7 only): ");
-
         boolean validNum;
         // TODO: Check for non integer input
         // and allow user to continue entering values until they get it right
         do {
             validNum = true;
-            numCPUs = scan.nextInt();
-            scan.nextLine();
-
+            try {
+                numCPUs = Integer.valueOf(JOptionPane.showInputDialog(null, "Welcome to Texas Holdem!\nHow many opponents would you like to face (between 1 and 7 only)"));
+            }catch(NumberFormatException e){
+                numCPUs = -1;
+            }
             if (numCPUs > 7 || numCPUs < 1) {
                 validNum = false;
-                System.out.print("Error! Number of opponents must be between 1 and 7. Please enter a valid number: ");
+                JOptionPane.showMessageDialog(null,"Error! Number of opponents must be between 1 and 7. Please enter a valid number: ");
             }
 
         } while (!validNum);
-
-        System.out.print("\nWhat is your name?: ");
-        username = scan.nextLine();
+        username = JOptionPane.showInputDialog(null, "What is your name?: ");
 
         int[] dealerCards = new int[5];
         for (int i = 0; i < 5; i++)
