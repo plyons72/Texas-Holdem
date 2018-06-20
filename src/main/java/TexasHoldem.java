@@ -8,6 +8,8 @@ Gary Xu
 import java.awt.*;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.imageio.*;
 import java.io.*;
 import java.util.*;
@@ -19,6 +21,11 @@ public class TexasHoldem {
 
     private static final int WINDOW_WIDTH = 950;
     private static final int WINDOW_HEIGHT = 750;
+
+    // for user betting methods
+    public static int userBetNumber = 0;
+    public static int cpuBetNumber = 0;
+    public static boolean userBetStatus = false;
 
     private static String img = "src/img/"; // address of the img folder
 
@@ -69,8 +76,8 @@ public class TexasHoldem {
             playerCards[i] = deck.dealCard();
         }
 
-        // Creates new player with name username, $1000, and starting cards
-        Player player = new Player(username, 1000, playerCards);
+        // Creates new player with name username, $1000, starting cards, and in status true
+        Player player = new Player(username, 1000, playerCards, true);
 
 
         // Creates array of CPU players
@@ -89,8 +96,8 @@ public class TexasHoldem {
                 cpuCards[j] = deck.dealCard();
             }
 
-            //Instantiate cpu object with their name, starting amount, and cards
-            cpuPlayer[i] = new Player(cpuNames[i], 1000, cpuCards);
+            //Instantiate cpu object with their name, starting amount, cards, and in status true
+            cpuPlayer[i] = new Player(cpuNames[i], 1000, cpuCards, true);
         }
 
         TexasHoldem texasHoldem = new TexasHoldem(numCPUs, player, cpuPlayer, dealer);
@@ -149,6 +156,105 @@ public class TexasHoldem {
 
     }
 
+    //takes in a CPU player and returns a JLabel array of their resized cards
+    public static JLabel[] getCpuCards(Player cpuPlayer) {
+
+        //get that CPUs cards and make a JLabel array to return
+        int[] cards = cpuPlayer.getCards();
+        JLabel displayCpuCard[] = new JLabel[2];
+
+        ImageIcon cpuCard0 = new ImageIcon(img + cards[0] + ".png");
+        ImageIcon cpuCard1 = new ImageIcon(img + cards[1] + ".png");
+
+        Image resizeCard0 = cpuCard0.getImage();
+        Image resizeCard1 = cpuCard1.getImage();
+        resizeCard0.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        resizeCard1.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        ImageIcon displayCpuCard0 = new ImageIcon(resizeCard0);
+        ImageIcon displayCpuCard1 = new ImageIcon(resizeCard1);
+        JLabel cpuCardImage0 = new JLabel(displayCpuCard0);
+        JLabel cpuCardImage1 = new JLabel(displayCpuCard1);
+
+        displayCpuCard[0] = cpuCardImage0;
+        displayCpuCard[1] = cpuCardImage1;
+
+        return displayCpuCard;
+
+    }
+
+    //runs until a bet has been made and then returns the amount the player bets (or -1 to fold)
+    //has to take in the player, the buttons, and the text field 
+    public static void userBet(Player player, JButton raiseButton, JTextArea raiseArea, JButton callButton, JButton foldButton) {
+
+    	//this should check if the play is in too
+    	while(!TexasHoldem.userBetStatus){
+
+    		//check if user has pressed raise button
+    		raiseButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					String userBetInput = raiseArea.getText();
+					//later this needs to check for only ints
+					//also needs to check for call number in order to add that to raise number
+					//also needs to allow player to re-bet if they put in an amount too high (or negative)
+					TexasHoldem.userBetNumber = Integer.parseInt(userBetInput); 
+					TexasHoldem.userBetStatus = true;
+				}          	
+	      	}); 
+
+    		//check if user has pressed call button
+    		callButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					//later this needs to set value equal to the current call value, not 0
+					TexasHoldem.userBetNumber = 0; 
+					TexasHoldem.userBetStatus = true;
+				}          
+	      	});
+
+    		//check if user has pressed fold button
+    		foldButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					TexasHoldem.userBetNumber = -1; 
+					TexasHoldem.userBetStatus = true;
+				}       
+	      	});
+
+    	}
+
+    	//user folded
+    	if(TexasHoldem.userBetNumber == -1){
+
+    		TexasHoldem.userBetNumber = 0; 
+    		player.setIn(false);
+    		
+
+    	}
+
+    	//we need to increase the pot and subtract from the user's funds down here too
+
+    }
+
+    //very basic cpu brain that controls the passed in cpu's bet based on the user's last bet
+    public static void cpuBet(Player cpuPlayer) {
+
+    	//if user called or folded, cpus call
+    	if(TexasHoldem.userBetNumber == 0){
+
+    		TexasHoldem.cpuBetNumber = 0;
+
+    	}
+
+    	//if user bet cpus fold
+    	else if(TexasHoldem.userBetNumber > 0){
+
+    		TexasHoldem.cpuBetNumber = 0;
+    		cpuPlayer.setIn(false);
+    		
+    	}
+
+    }
 
     TexasHoldem(int numCPUs, Player player, Player[] cpuPlayer, Dealer dealer) {
 
@@ -216,11 +322,15 @@ public class TexasHoldem {
         humanPlayerPanel.add(displayHumanCard1, BorderLayout.EAST);
 
 
-        //initializing buttons
+        //initializing buttons and fields
         JButton raiseButton = new JButton("Raise");
         raiseButton.setVisible(true);
         raiseButton.setHorizontalAlignment(SwingConstants.LEFT);
         raiseButton.setVerticalAlignment(SwingConstants.CENTER);
+    	JTextArea raiseArea = new JTextArea("Type Here!");
+    	raiseArea.setVisible(true);
+    	raiseArea.setBackground(Color.BLUE);
+        raiseArea.setForeground(Color.WHITE);
         JButton callButton = new JButton("Call");
         callButton.setVisible(true);
         callButton.setHorizontalAlignment(SwingConstants.LEFT);
@@ -229,6 +339,12 @@ public class TexasHoldem {
         foldButton.setVisible(true);
         foldButton.setHorizontalAlignment(SwingConstants.LEFT);
         foldButton.setVerticalAlignment(SwingConstants.CENTER);
+
+        //adding buttons and fields to panels
+        middlePanel.add(raiseButton);
+        middlePanel.add(raiseArea);
+        middlePanel.add(callButton);
+        middlePanel.add(foldButton);
 
         // initializing texts
         // display amount of money in the pot
@@ -241,11 +357,6 @@ public class TexasHoldem {
 
         // Player names
         JLabel[] playerNames = new JLabel[numCPUs];
-
-        //adding buttons to panels
-        middlePanel.add(raiseButton);
-        middlePanel.add(callButton);
-        middlePanel.add(foldButton);
 
         // adding texts to panel
         middlePanel.add(potMoneyLabel);
@@ -266,6 +377,23 @@ public class TexasHoldem {
             bottomPanel.add(playerPanel[i]);
         }
 
+        //showing all cpu cards
+        for(int i = 0; i < numCPUs; i++) {
+
+        	//check if the player is in
+        	if(cpuPlayer[i].getIn()){
+
+        		//get and display the CPU's cards
+            	JLabel displayCpuCard[] = new JLabel[2];
+            	displayCpuCard = getCpuCards(cpuPlayer[i]);
+
+            	playerPanel[i].removeAll();
+            	playerPanel[i].add(displayCpuCard[0]);
+            	playerPanel[i].add(displayCpuCard[1]);
+
+            }
+
+        }
 
         //adding panels to frame
         windowFrame.add(topPanel, BorderLayout.NORTH);
@@ -277,5 +405,22 @@ public class TexasHoldem {
         //update frame
         windowFrame.setVisible(true);
 
+        //let the user bet
+        userBet(player, raiseButton, raiseArea, callButton, foldButton);
+
+        //just me testing my user bet function
+		System.out.print("\nyou bet: ");
+        System.out.print(TexasHoldem.userBetNumber);
+
+        //let the cpus bet
+        for(int i = 0; i < numCPUs; i++) {
+	        
+	        cpuBet(cpuPlayer[i]);
+
+			//just me testing my cpu bet function
+			System.out.print("\ncpu bet: ");
+	        System.out.print(TexasHoldem.cpuBetNumber);
+
+	    }
     }
 }
