@@ -156,7 +156,7 @@ public class TexasHoldem {
     }
 
     //takes in a CPU player and returns a JLabel array of their resized cards
-    public static JLabel[] getCpuCards(Player cpuPlayer) {
+    public static JLabel[] getCpuCards(Player[] cpuPlayer) {
 
         //get that CPUs cards and make a JLabel array to return
         int[] cards = cpuPlayer.getCards();
@@ -236,7 +236,7 @@ public class TexasHoldem {
     }
 
     //very basic cpu brain that controls the passed in cpu's bet based on the user's last bet
-    public static void cpuBet(Player cpuPlayer) {
+    public static void cpuBet(Player[] cpuPlayer) {
 
     	//if user called or folded, cpus call
     	if(TexasHoldem.userBetNumber == 0){
@@ -256,6 +256,18 @@ public class TexasHoldem {
     }
 
     TexasHoldem(int numCPUs, Player player, Player[] cpuPlayer, Dealer dealer, Deck deck) {
+
+
+        try {
+            Log log = new Log();
+            log.printStartGame();
+            log.printUserName(player);
+            log.printCPUNames(cpuPlayer);
+            log.printCardDealt(player,cpuPlayer);
+            log.printHand(1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
         // Gets cards for human player
         int [] humanPlayerDeck = player.getCards();
