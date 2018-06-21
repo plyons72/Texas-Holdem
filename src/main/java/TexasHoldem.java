@@ -225,7 +225,7 @@ public class TexasHoldem {
     	//user folded
     	if(TexasHoldem.userBetNumber == -1){
 
-    		TexasHoldem.userBetNumber = 0; 
+    		TexasHoldem.userBetNumber = -1;
     		player.setIn(false);
     		
 
