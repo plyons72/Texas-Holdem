@@ -255,9 +255,19 @@ public class TexasHoldem {
     }
 
     TexasHoldem(int numCPUs, Player player, Player[] cpuPlayer, Dealer dealer) {
-
+        try {
+            Log log = new Log();
+            log.printStartGame();
+            log.printUserName(player);
+            log.printCPUNames(cpuPlayer);
+            log.printCardDealt(player,cpuPlayer);
+            log.printHand(1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // Gets cards for human player
         int [] humanPlayerDeck = player.getCards();
+
 
         // Get cards for flop, turn, and river
         int[] sharedDeck = dealer.getFTR();
