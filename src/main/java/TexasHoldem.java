@@ -98,7 +98,8 @@ public class TexasHoldem {
             cpuPlayer[i] = new Player(cpuNames[i], 1000, cpuCards, true);
         }
 
-        TexasHoldem texasHoldem = new TexasHoldem(numCPUs, player, cpuPlayer, dealer);
+        TexasHoldem texasHoldem = new TexasHoldem(numCPUs, player, cpuPlayer, dealer, deck);
+
 
     }
 
@@ -224,7 +225,7 @@ public class TexasHoldem {
     	//user folded
     	if(TexasHoldem.userBetNumber == -1){
 
-    		TexasHoldem.userBetNumber = 0; 
+    		TexasHoldem.userBetNumber = -1;
     		player.setIn(false);
     		
 
@@ -254,7 +255,7 @@ public class TexasHoldem {
 
     }
 
-    TexasHoldem(int numCPUs, Player player, Player[] cpuPlayer, Dealer dealer) {
+    TexasHoldem(int numCPUs, Player player, Player[] cpuPlayer, Dealer dealer, Deck deck) {
 
         // Gets cards for human player
         int [] humanPlayerDeck = player.getCards();
@@ -376,7 +377,7 @@ public class TexasHoldem {
         }
 
         //showing all cpu cards
-        for(int i = 0; i < numCPUs; i++) {
+     /*   for(int i = 0; i < numCPUs; i++) {
 
         	//check if the player is in
         	if(cpuPlayer[i].getIn()){
@@ -391,7 +392,7 @@ public class TexasHoldem {
 
             }
 
-        }
+        }*/
 
         //adding panels to frame
         windowFrame.add(topPanel, BorderLayout.NORTH);
@@ -404,21 +405,80 @@ public class TexasHoldem {
         windowFrame.setVisible(true);
 
         //let the user bet
-        userBet(player, raiseButton, raiseArea, callButton, foldButton);
+        //userBet(player, raiseButton, raiseArea, callButton, foldButton);
 
         //just me testing my user bet function
-		System.out.print("\nyou bet: ");
-        System.out.print(TexasHoldem.userBetNumber);
+		//System.out.print("\nyou bet: ");
+        //System.out.print(TexasHoldem.userBetNumber);
 
-        //let the cpus bet
-        for(int i = 0; i < numCPUs; i++) {
-	        
-	        cpuBet(cpuPlayer[i]);
+        while(true) {
+            System.out.println("We only made it to here");
+            userBet(player, raiseButton, raiseArea, callButton, foldButton);
+            System.out.println("We made it here");
+            for (int i = 0; i < numCPUs; i++) {
+                cpuBet(cpuPlayer[i]);
+            }
 
-			//just me testing my cpu bet function
-			System.out.print("\ncpu bet: ");
-	        System.out.print(TexasHoldem.cpuBetNumber);
+            if (userBetNumber != -1) {
+                player.setAmount(dealer.returnWinnings(player.getMoney()));
+                userBetStatus=false;
+            } else {
+                //AI Flop Turn River Win Eval
+                //Reveal AI Cards
+            }
 
-	    }
+            deck.reShuffle();
+
+            int[] dealerCards = new int[5];
+            for (int i = 0; i < 5; i++) {
+                dealerCards[i] = deck.dealCard();
+            }
+            dealer.setSharedCards(dealerCards);
+
+            int[] playerCards = new int[2];
+            for (int i = 0; i < 2; i++) {
+                playerCards[i] = deck.dealCard();
+            }
+            player.setCards(playerCards);
+            humanPlayerDeck = player.getCards();
+
+            for (int i = 0; i < numCPUs; i++) {
+                //Get cards for cpu
+                int[] cpuCards = new int[2];
+                for (int j = 0; j < 2; j++) {
+                    cpuCards[j] = deck.dealCard();
+                }
+                cpuPlayer[i].setCards(cpuCards);
+            }
+
+            for (int i = 0; i < numCPUs; i++) {
+
+                //check if the player is in
+                if (cpuPlayer[i].getIn()) {
+
+                    ImageIcon backOfCard = new ImageIcon(img + "backOfCard.png");
+                    JLabel faceDownCard = new JLabel(backOfCard);
+                    playerPanel[i].removeAll();
+                    playerPanel[i].add(faceDownCard);
+                    playerPanel[i].add(faceDownCard);
+
+                }
+
+            }
+
+            humanPlayerPanel.removeAll();
+
+            humanPlayerCard0 = new ImageIcon(img + humanPlayerDeck[0] + ".png");
+            humanPlayerCard1 = new ImageIcon(img + humanPlayerDeck[1] + ".png");
+            displayHumanCard0 = new JLabel(humanPlayerCard0);
+            displayHumanCard1 = new JLabel(humanPlayerCard1);
+
+
+            humanPlayerPanel.add(humanPlayerName, BorderLayout.NORTH);
+            humanPlayerPanel.add(displayHumanCard0, BorderLayout.WEST);
+            humanPlayerPanel.add(displayHumanCard1, BorderLayout.EAST);
+
+        }
+
     }
 }
