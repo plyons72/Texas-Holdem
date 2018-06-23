@@ -30,8 +30,9 @@ public class Log {
     public void printCPUNames(Player[] cpuPlayers) throws IOException {
         setupWriters();
         bw.write("AI Players: ");
-        for (Player cpuPlayer : cpuPlayers) {
-            bw.write(", " + cpuPlayer.getName());
+        for (int i = 0; i < cpuPlayers.length; i++) {
+            bw.write(cpuPlayers[i].getName());
+            if(i < cpuPlayers.length - 1) { bw.write(", "); }
         }
         bw.write("\n");
         bw.close();
