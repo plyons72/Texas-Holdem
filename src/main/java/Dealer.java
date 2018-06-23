@@ -27,7 +27,6 @@ public class Dealer {
     public int getPotValue() { return potValue; }
     public int[] getFTR() { return ftr; }
 
-
     // Takes in an array of player cards
     public int checkWinCon(Player player){
 
@@ -56,6 +55,8 @@ public class Dealer {
         // Check for a flush to see if we have a straight flush or royal flush later
         boolean foundFlush = false;
 
+        boolean foundStraightFlush = false;
+
         // Cards that a user has at their disposal to make winning combo with
         int[] cardArray = new int[7];
 
@@ -82,15 +83,16 @@ public class Dealer {
 
         // Build array to check for flush;
         for(int i = 0; i < suitArray.length; i++) {
-            suitArray[cardArray[i] - 1 / 13]++;
+            int suiteNum = (cardArray[i] - 1) / 13;
+            suitArray[suiteNum]++;
         }
 
         // Check for flush
         for (int i = 0; i < suitArray.length; i++)
         {
-            if (suitArray[i] = 5 && rank > 5) {
+            if (suitArray[i] == 5 && rank > 5) {
                 rank = 5;
-                foundFlush = True;
+                foundFlush = true;
             }
         }
 
@@ -130,7 +132,7 @@ public class Dealer {
 
                     // Check for full house
                     if (foundPair) {
-                        if(rank > 4){ rank = 4 };
+                        if(rank > 4){ rank = 4; }
                     }
                     break;
 
@@ -143,8 +145,8 @@ public class Dealer {
                 //We have a high card
                 default:
                     if (rank > 10) {
-                        rank = 10
-                    } ;
+                        rank = 10;
+                    }
                     break;
             }
 
@@ -153,7 +155,7 @@ public class Dealer {
         // Check for straight, straight flush
         for (int i = 0; i < cardTypes.length - 5; i++) {
             if (cardTypes[i] > 0 && cardTypes[i + 1] > 0 && cardTypes[i + 2] > 0 && cardTypes[i+3] > 0 && cardTypes[i+4] > 0) {
-                if(flushFound) {
+                if(foundFlush) {
                     if (rank > 2) {
                         rank = 2;
                         foundStraightFlush = true;

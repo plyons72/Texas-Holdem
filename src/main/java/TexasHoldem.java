@@ -156,7 +156,7 @@ public class TexasHoldem {
     }
 
     //takes in a CPU player and returns a JLabel array of their resized cards
-    public static JLabel[] getCpuCards(Player[] cpuPlayer) {
+    public static JLabel[] getCpuCards(Player cpuPlayer) {
 
         //get that CPUs cards and make a JLabel array to return
         int[] cards = cpuPlayer.getCards();
@@ -236,7 +236,7 @@ public class TexasHoldem {
     }
 
     //very basic cpu brain that controls the passed in cpu's bet based on the user's last bet
-    public static void cpuBet(Player[] cpuPlayer) {
+    public static void cpuBet(Player cpuPlayer) {
 
     	//if user called or folded, cpus call
     	if(TexasHoldem.userBetNumber == 0){
@@ -293,11 +293,11 @@ public class TexasHoldem {
         bottomPanel.setBackground(Color.decode("#336d50"));
 
         // initializing panel for sharedCards      
-        ImageIcon sharedCard0 = new ImageIcon(img + sharedDeck[0] + ".png");
-        ImageIcon sharedCard1 = new ImageIcon(img + sharedDeck[1] + ".png");
-        ImageIcon sharedCard2 = new ImageIcon(img + sharedDeck[2] + ".png");
-        ImageIcon sharedCard3 = new ImageIcon(img + sharedDeck[3] + ".png");
-        ImageIcon sharedCard4 = new ImageIcon(img + sharedDeck[4] + ".png");
+        ImageIcon sharedCard0 = new ImageIcon(img + "backOfCard.png");
+        ImageIcon sharedCard1 = new ImageIcon(img + "backOfCard.png");
+        ImageIcon sharedCard2 = new ImageIcon(img + "backOfCard.png");
+        ImageIcon sharedCard3 = new ImageIcon(img + "backOfCard.png");
+        ImageIcon sharedCard4 = new ImageIcon(img + "backOfCard.png");
 
         // creating JLabel with sharedCards
         JLabel displaysharedCard0 = new JLabel(sharedCard0);
@@ -422,7 +422,8 @@ public class TexasHoldem {
         //just me testing my user bet function
 		//System.out.print("\nyou bet: ");
         //System.out.print(TexasHoldem.userBetNumber);
-
+        int[] cpuRanks = new int[numCPUs];
+        int playerRanks;
         while(true) {
             System.out.println("We only made it to here");
             userBet(player, raiseButton, raiseArea, callButton, foldButton);
@@ -437,6 +438,16 @@ public class TexasHoldem {
             } else {
                 //AI Flop Turn River Win Eval
                 //Reveal AI Cards
+
+                for(int i = 0; i < numCPUs; i++)
+                {
+                    // Get ranks for win condition
+
+                    cpuRanks[i] = dealer.checkWinCon(cpuPlayer[i]);
+                    playerRanks = dealer.checkWinCon(player);
+                }
+
+
             }
 
             deck.reShuffle();
