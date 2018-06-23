@@ -28,7 +28,7 @@ public class Dealer {
     public int[] getFTR() { return ftr; }
 
     // Takes in an array of player cards
-    public void getRank(Player player){
+    public void determineRank(Player player){
 
         // Holds a rank 1 through 9 to give to the user, and be compared later to determine a winner
         /*
@@ -49,7 +49,7 @@ public class Dealer {
         if (player.getRank() == 12) { return; }
 
         // Local variable to hold the rank to set
-        int rank = 11;
+        int rank = 12;
 
         // Check to see if we've already found a pair, if so, we have 2 pair, or full house
         boolean foundPair = false;
@@ -72,7 +72,7 @@ public class Dealer {
         int[] suitArray = {0,0,0,0};
 
         // Holds cards that only this player has
-        int[] playerCards = this.ftr;
+        int[] playerCards = player.getCards();
         cardArray[0] = playerCards[0];
         cardArray[1] = playerCards[1];
 

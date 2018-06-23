@@ -251,16 +251,17 @@ public class TexasHoldem {
     TexasHoldem(int numCPUs, Player player, Player[] cpuPlayer, Dealer dealer, Deck deck) {
 
 
-        try {
+        try
+        {
             Log log = new Log();
             log.printStartGame();
             log.printUserName(player);
             log.printCPUNames(cpuPlayer);
             log.printCardDealt(player,cpuPlayer);
             log.printHand(1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        }
+
+        catch (IOException e) { e.printStackTrace(); }
 
         // Gets cards for human player
         int [] humanPlayerDeck = player.getCards();
@@ -428,8 +429,6 @@ public class TexasHoldem {
 
             // Check if we revealed flop, if not, reveal, and set var to true
             if (!flopSet) {
-                System.out.println("Flop should show");
-
                 // Reassign the shared card variables, recreate display labels, repaint
                 sharedCard0 = new ImageIcon(img + sharedDeck[0] + ".png");
                 sharedCard1 = new ImageIcon(img + sharedDeck[1] + ".png");
@@ -483,12 +482,11 @@ public class TexasHoldem {
                 for(int i = 0; i < numCPUs; i++)
                 {
                     // Get ranks for win condition
-                    dealer.getRank(cpuPlayer[i]);
+                    dealer.determineRank(cpuPlayer[i]);
                 }
 
-                dealer.getRank(player);
+                dealer.determineRank(player);
 
-                System.out.println("Finished figuring out winner");
                 System.out.printf("\nPlayer rank is %d", player.getRank());
                 for(int i = 0; i < numCPUs; i++) { System.out.printf("\nCPU %d has rank %d", i, cpuPlayer[i].getRank()); }
 
