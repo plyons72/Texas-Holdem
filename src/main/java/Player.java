@@ -8,9 +8,11 @@ Gary Xu
 public class Player
 {
     private int playerMoney;
-    private String playerName;
+    private int playerRank;
     private int[] playerCards;
+    private String playerName;
     private boolean playerIn;
+
 
     // Basic blank constructor
     public Player()
@@ -21,26 +23,27 @@ public class Player
     }
 
     // Create a player object with their name, amount, and starting cards
-    public Player(String name, int amount, int[] cards, boolean in)
+    public Player(String name, int amount, int[] cards, boolean in, int rank)
     {
         playerName = name;
         playerMoney = amount;
         playerCards = cards;
         playerIn = true;
+        playerRank = rank;
 
     }
 
     // Return the name of a player
     public String getName() { return playerName; }
 
-      // Return the current money owned by player
+    // Return the current money owned by player
     public int getMoney() { return playerMoney; }
 
-    // Sets the player name
-    public void setName(String name) { playerName = name; }
+    // Sets the amount of money a player has
+    public void removeBetAmount(int amount) { playerMoney -= amount; }
 
     // Sets the amount of money a player has
-    public void setAmount(int amount) { playerMoney = amount; }
+    public void increaseWinnings(int amount) { playerMoney += amount; }
 
     //Sets the cards a player has
     public void setCards(int[] cards) { playerCards = cards; }
@@ -53,4 +56,8 @@ public class Player
 
     //Sets the cards a player has
     public void setIn(boolean in) { playerIn = in; }
+
+    public void setRank(int rank) { playerRank = rank; }
+
+    public int getRank() { return playerRank; }
 }

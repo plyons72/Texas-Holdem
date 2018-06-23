@@ -6,15 +6,11 @@ Gary Xu
  */
 
 import java.awt.*;
-import java.awt.font.TextAttribute;
-import java.awt.image.BufferedImage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.imageio.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicOptionPaneUI;
 
 
 public class TexasHoldem {
@@ -41,8 +37,7 @@ public class TexasHoldem {
         Deck deck = new Deck();
 
         boolean validNum;
-        // TODO: Check for non integer input
-        // and allow user to continue entering values until they get it right
+
         do {
             validNum = true;
             try {
@@ -74,9 +69,9 @@ public class TexasHoldem {
             playerCards[i] = deck.dealCard();
         }
 
-        // Creates new player with name username, $1000, starting cards, and in status true
-        Player player = new Player(username, 1000, playerCards, true);
 
+        // Creates new player with name username, $1000, starting cards, in status true, and rank in game
+        Player player = new Player(username, 1000, playerCards, true, 0);
 
         // Creates array of CPU players
         Player[] cpuPlayer = new Player[numCPUs];
@@ -94,18 +89,16 @@ public class TexasHoldem {
                 cpuCards[j] = deck.dealCard();
             }
 
-            //Instantiate cpu object with their name, starting amount, cards, and in status true
-            cpuPlayer[i] = new Player(cpuNames[i], 1000, cpuCards, true);
+            //Instantiate cpu object with their name, starting amount, cards, in status true, and rank in game
+            cpuPlayer[i] = new Player(cpuNames[i], 1000, cpuCards, true, 0);
         }
 
         TexasHoldem texasHoldem = new TexasHoldem(numCPUs, player, cpuPlayer, dealer, deck);
-
 
     }
 
     // Takes in a number of names to return to the user, and returns a string
     // array containing names randomly selected from the table below
-    //TODO: Make sure we get random names
     public static String[] getNames(int numCPU) {
         Random rand = new Random();
         boolean dupChecker;
@@ -146,6 +139,7 @@ public class TexasHoldem {
             indexesSelected.add(temp);
         }
 
+        // Returns the array of cpu names
         for (int j = 0; j < cpuNames.length; j++)
         {
             cpuNames[j] = nameArray[indexesSelected.get(j)];
@@ -193,9 +187,9 @@ public class TexasHoldem {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					String userBetInput = raiseArea.getText();
-					//later this needs to check for only ints
-					//also needs to check for call number in order to add that to raise number
-					//also needs to allow player to re-bet if they put in an amount too high (or negative)
+					//TODO: check for only ints
+					//TODO: check for call number in order to add that to raise number
+					//TODO: allow player to re-bet if they put in an amount too high (or negative)
 					TexasHoldem.userBetNumber = Integer.parseInt(userBetInput); 
 					TexasHoldem.userBetStatus = true;
 				}          	
@@ -231,7 +225,10 @@ public class TexasHoldem {
 
     	}
 
-    	//we need to increase the pot and subtract from the user's funds down here too
+    	// Otherwise, remove their bet from their pot.
+    	else {
+    	    player.removeBetAmount(userBetNumber);
+        }
 
     }
 
@@ -239,11 +236,7 @@ public class TexasHoldem {
     public static void cpuBet(Player cpuPlayer) {
 
     	//if user called or folded, cpus call
-    	if(TexasHoldem.userBetNumber == 0){
-
-    		TexasHoldem.cpuBetNumber = 0;
-
-    	}
+    	if(TexasHoldem.userBetNumber == 0){ TexasHoldem.cpuBetNumber = 0; }
 
     	//if user bet cpus fold
     	else if(TexasHoldem.userBetNumber > 0){
@@ -338,7 +331,7 @@ public class TexasHoldem {
         raiseButton.setVisible(true);
         raiseButton.setHorizontalAlignment(SwingConstants.LEFT);
         raiseButton.setVerticalAlignment(SwingConstants.CENTER);
-    	JTextArea raiseArea = new JTextArea("Type Here!");
+    	JTextArea raiseArea = new JTextArea("0");
     	raiseArea.setVisible(true);
     	raiseArea.setBackground(Color.BLUE);
         raiseArea.setForeground(Color.WHITE);
@@ -360,7 +353,7 @@ public class TexasHoldem {
         // initializing texts
         // display amount of money in the pot
         JLabel potMoneyLabel = new JLabel();
-        potMoneyLabel.setText("POT: $" + dealer.getPotValue());
+        potMoneyLabel.setText("POT: $" + dealer.getWinnings());
         potMoneyLabel.setVerticalAlignment(SwingConstants.CENTER);
         potMoneyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         potMoneyLabel.setFont(new Font("Consolas", Font.BOLD, 14));
@@ -388,24 +381,6 @@ public class TexasHoldem {
             bottomPanel.add(playerPanel[i]);
         }
 
-        //showing all cpu cards
-     /*   for(int i = 0; i < numCPUs; i++) {
-
-        	//check if the player is in
-        	if(cpuPlayer[i].getIn()){
-
-        		//get and display the CPU's cards
-            	JLabel displayCpuCard[] = new JLabel[2];
-            	displayCpuCard = getCpuCards(cpuPlayer[i]);
-
-            	playerPanel[i].removeAll();
-            	playerPanel[i].add(displayCpuCard[0]);
-            	playerPanel[i].add(displayCpuCard[1]);
-
-            }
-
-        }*/
-
         //adding panels to frame
         windowFrame.add(topPanel, BorderLayout.NORTH);
         windowFrame.add(middlePanel, BorderLayout.CENTER);
@@ -413,93 +388,207 @@ public class TexasHoldem {
         windowFrame.add(humanPlayerPanel, BorderLayout.WEST);
 
 
-        //update frame
+        // Update frame
         windowFrame.setVisible(true);
 
-        //let the user bet
-        //userBet(player, raiseButton, raiseArea, callButton, foldButton);
+        // Used to check if we've already shown the flop and turn
+        boolean flopSet = false;
+        boolean turnSet = false;
 
-        //just me testing my user bet function
-		//System.out.print("\nyou bet: ");
-        //System.out.print(TexasHoldem.userBetNumber);
-        int[] cpuRanks = new int[numCPUs];
-        int playerRanks;
-        while(true) {
-            System.out.println("We only made it to here");
+        // Used to check if the game is over
+        boolean endGame = false;
+
+        // Run the game
+        while(!endGame) {
+
+            int[] cpuRank = new int[numCPUs];
+            int playerRank;
+
             userBet(player, raiseButton, raiseArea, callButton, foldButton);
-            System.out.println("We made it here");
             for (int i = 0; i < numCPUs; i++) {
                 cpuBet(cpuPlayer[i]);
             }
 
+            // Check to see if the user made a bet
+            // If so, increase the pot by that amount, set bet status to false to allow future bets, and have AIs fold
+            // TODO: Dont have AIs fold automatically in the future
             if (userBetNumber != -1) {
-                player.setAmount(dealer.returnWinnings(player.getMoney()));
-                userBetStatus=false;
-            } else {
-                //AI Flop Turn River Win Eval
-                //Reveal AI Cards
+                dealer.increaseWinnings(userBetNumber);
+                userBetStatus = false;
+
+
+                for (int i = 0; i < numCPUs; i++)
+                {
+                    cpuPlayer[i].setRank(12);
+                }
+            }
+
+            // User folded. Have all the AIs call
+            else { player.setRank(12); }
+
+            // Check if we revealed flop, if not, reveal, and set var to true
+            if (!flopSet) {
+                System.out.println("Flop should show");
+
+                // Reassign the shared card variables, recreate display labels, repaint
+                sharedCard0 = new ImageIcon(img + sharedDeck[0] + ".png");
+                sharedCard1 = new ImageIcon(img + sharedDeck[1] + ".png");
+                sharedCard2 = new ImageIcon(img + sharedDeck[2] + ".png");
+
+                topPanel.remove(displaysharedCard0);
+                topPanel.remove(displaysharedCard1);
+                topPanel.remove(displaysharedCard2);
+
+                displaysharedCard0 = new JLabel(sharedCard0);
+                displaysharedCard1 = new JLabel(sharedCard1);
+                displaysharedCard2 = new JLabel(sharedCard2);
+
+                topPanel.add(displaysharedCard0);
+                topPanel.add(displaysharedCard1);
+                topPanel.add(displaysharedCard2);
+
+                topPanel.repaint();
+
+                flopSet = true;
+            }
+
+            // Check if we revealed turn, if not, reveal, and set var to true
+            else if(!turnSet){
+                // Reassign the shared card variables, recreate display labels, repaint
+                sharedCard3 = new ImageIcon(img + sharedDeck[3] + ".png");
+
+                topPanel.remove(displaysharedCard3);
+
+                displaysharedCard3 = new JLabel(sharedCard3);
+
+                topPanel.add(displaysharedCard3);
+
+                topPanel.repaint();
+
+                turnSet = true;
+            }
+
+            // Check if we revealed river, if not, reveal, and set var to true, and exit
+            else {
+                sharedCard4 = new ImageIcon(img + sharedDeck[4] + ".png");
+
+                topPanel.remove(displaysharedCard4);
+
+                displaysharedCard4 = new JLabel(sharedCard4);
+
+                topPanel.add(displaysharedCard4);
+
+                topPanel.repaint();
 
                 for(int i = 0; i < numCPUs; i++)
                 {
                     // Get ranks for win condition
-
-                    cpuRanks[i] = dealer.checkWinCon(cpuPlayer[i]);
-                    playerRanks = dealer.checkWinCon(player);
+                    dealer.getRank(cpuPlayer[i]);
                 }
 
+                dealer.getRank(player);
 
-            }
+                System.out.println("Finished figuring out winner");
+                System.out.printf("\nPlayer rank is %d", player.getRank());
+                for(int i = 0; i < numCPUs; i++) { System.out.printf("\nCPU %d has rank %d", i, cpuPlayer[i].getRank()); }
 
-            deck.reShuffle();
 
-            int[] dealerCards = new int[5];
-            for (int i = 0; i < 5; i++) {
-                dealerCards[i] = deck.dealCard();
-            }
-            dealer.setSharedCards(dealerCards);
+                // Show all the CPU cards
+                for(int i = 0; i < numCPUs; i++) {
 
-            int[] playerCards = new int[2];
-            for (int i = 0; i < 2; i++) {
-                playerCards[i] = deck.dealCard();
-            }
-            player.setCards(playerCards);
-            humanPlayerDeck = player.getCards();
+                    //get and display the CPU's cards
+                    JLabel displayCpuCard[] = new JLabel[2];
+                    displayCpuCard = getCpuCards(cpuPlayer[i]);
 
-            for (int i = 0; i < numCPUs; i++) {
-                //Get cards for cpu
-                int[] cpuCards = new int[2];
-                for (int j = 0; j < 2; j++) {
-                    cpuCards[j] = deck.dealCard();
-                }
-                cpuPlayer[i].setCards(cpuCards);
-            }
-
-            for (int i = 0; i < numCPUs; i++) {
-
-                //check if the player is in
-                if (cpuPlayer[i].getIn()) {
-
-                    ImageIcon backOfCard = new ImageIcon(img + "backOfCard.png");
-                    JLabel faceDownCard = new JLabel(backOfCard);
                     playerPanel[i].removeAll();
-                    playerPanel[i].add(faceDownCard);
-                    playerPanel[i].add(faceDownCard);
+                    playerPanel[i].add(displayCpuCard[0]);
+                    playerPanel[i].add(displayCpuCard[1]);
+                    playerPanel[i].repaint();
 
                 }
 
+                // Keep track of index for winning player (highest rank)
+                // -1 corresponds to player
+                int winner = -1;
+
+                for (int i = 0; i < numCPUs; i++) {
+
+                    if (winner == -1) {
+                        if (cpuPlayer[i].getRank() < player.getRank()) { winner = i; }
+                    }
+
+                    else {
+                        if (cpuPlayer[i].getRank() < cpuPlayer[winner].getRank()){
+                            winner = i;
+                        }
+                    }
+                }
+
+                // Give the winner their money
+                if (winner == -1 ) { player.increaseWinnings(dealer.getWinnings()); }
+                else { cpuPlayer[winner].increaseWinnings(dealer.getWinnings()); }
+
+                endGame = true;
+
             }
 
-            humanPlayerPanel.removeAll();
+            //TODO: Change this later to allow us to play more games
+            boolean playAgain = false;
 
-            humanPlayerCard0 = new ImageIcon(img + humanPlayerDeck[0] + ".png");
-            humanPlayerCard1 = new ImageIcon(img + humanPlayerDeck[1] + ".png");
-            displayHumanCard0 = new JLabel(humanPlayerCard0);
-            displayHumanCard1 = new JLabel(humanPlayerCard1);
+            if (playAgain)
+            {
+                deck.reShuffle();
+
+                int[] dealerCards = new int[5];
+                for (int i = 0; i < 5; i++) {
+                    dealerCards[i] = deck.dealCard();
+                }
+                dealer.setSharedCards(dealerCards);
+
+                int[] playerCards = new int[2];
+                for (int i = 0; i < 2; i++) {
+                    playerCards[i] = deck.dealCard();
+                }
+                player.setCards(playerCards);
+                humanPlayerDeck = player.getCards();
+
+                for (int i = 0; i < numCPUs; i++) {
+                    //Get cards for cpu
+                    int[] cpuCards = new int[2];
+                    for (int j = 0; j < 2; j++) {
+                        cpuCards[j] = deck.dealCard();
+                    }
+                    cpuPlayer[i].setCards(cpuCards);
+                }
+
+                for (int i = 0; i < numCPUs; i++) {
+
+                    //check if the player is in
+                    if (cpuPlayer[i].getIn()) {
+
+                        ImageIcon backOfCard = new ImageIcon(img + "backOfCard.png");
+                        JLabel faceDownCard = new JLabel(backOfCard);
+                        playerPanel[i].removeAll();
+                        playerPanel[i].add(faceDownCard);
+                        playerPanel[i].add(faceDownCard);
+
+                    }
+
+                }
+
+                humanPlayerPanel.removeAll();
+
+                humanPlayerCard0 = new ImageIcon(img + humanPlayerDeck[0] + ".png");
+                humanPlayerCard1 = new ImageIcon(img + humanPlayerDeck[1] + ".png");
+                displayHumanCard0 = new JLabel(humanPlayerCard0);
+                displayHumanCard1 = new JLabel(humanPlayerCard1);
 
 
-            humanPlayerPanel.add(humanPlayerName, BorderLayout.NORTH);
-            humanPlayerPanel.add(displayHumanCard0, BorderLayout.WEST);
-            humanPlayerPanel.add(displayHumanCard1, BorderLayout.EAST);
+                humanPlayerPanel.add(humanPlayerName, BorderLayout.NORTH);
+                humanPlayerPanel.add(displayHumanCard0, BorderLayout.WEST);
+                humanPlayerPanel.add(displayHumanCard1, BorderLayout.EAST);
+            }
+
 
         }
 

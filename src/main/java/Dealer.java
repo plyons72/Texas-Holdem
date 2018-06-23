@@ -20,15 +20,15 @@ public class Dealer {
     }
 
     // Setters
-    public void setPotValue(int bet) { potValue += bet; }
+    public void increaseWinnings(int bet) { potValue += bet; }
     public void setSharedCards(int[] cards) { ftr = cards; }
 
     // Getters
-    public int getPotValue() { return potValue; }
+    public int getWinnings() { return potValue; }
     public int[] getFTR() { return ftr; }
 
     // Takes in an array of player cards
-    public int checkWinCon(Player player){
+    public void getRank(Player player){
 
         // Holds a rank 1 through 9 to give to the user, and be compared later to determine a winner
         /*
@@ -44,6 +44,11 @@ public class Dealer {
             10 - High Card
         */
 
+        // Check to see if the player rank is 12, indicating that they folded
+        // If they folded, just return
+        if (player.getRank() == 12) { return; }
+
+        // Local variable to hold the rank to set
         int rank = 11;
 
         // Check to see if we've already found a pair, if so, we have 2 pair, or full house
@@ -67,7 +72,7 @@ public class Dealer {
         int[] suitArray = {0,0,0,0};
 
         // Holds cards that only this player has
-        int[] playerCards = player.getCards();
+        int[] playerCards = this.ftr;
         cardArray[0] = playerCards[0];
         cardArray[1] = playerCards[1];
 
@@ -95,7 +100,6 @@ public class Dealer {
                 foundFlush = true;
             }
         }
-
 
         // Check for pairs, 3 of a kind, 4 of a kind
         for(int i = 0; i < cardTypes.length; i++) {
@@ -152,16 +156,19 @@ public class Dealer {
 
         }
 
+        // This is a bit of a hacky way to check for straight flush, or royal straight flush, as we can have
+        // a flush without those 5 cards being our straight cards. Fix this later.
+
+        //TODO: Accurately check for a straight flush. Straights should still be fine
         // Check for straight, straight flush
         for (int i = 0; i < cardTypes.length - 5; i++) {
-            if (cardTypes[i] > 0 && cardTypes[i + 1] > 0 && cardTypes[i + 2] > 0 && cardTypes[i+3] > 0 && cardTypes[i+4] > 0) {
-                if(foundFlush) {
-                    if (rank > 2) {
-                        rank = 2;
-                        foundStraightFlush = true;
-                    }
-                }
-                // Found a straight
+            if (cardTypes[i] > 0 && cardTypes[i + 1] > 0 &&
+                    cardTypes[i + 2] > 0 && cardTypes[i+3] > 0 && cardTypes[i+4] > 0) {
+
+                // We have a straight. If we also have a flush, it's likely we have a straight flush
+                if(foundFlush) { if (rank > 2) { rank = 2; } }
+
+                // Found a straight otherwise
                 else {
                     if (rank > 6) { rank = 6; }
                 }
@@ -169,22 +176,13 @@ public class Dealer {
         }
 
         // Check for royal flush
-        if(cardTypes[0] > 0 && cardTypes[12] > 0 && cardTypes[11] > 0 && cardTypes[10] > 0 && cardTypes[9] > 0 && foundFlush)
-        {
+        if(cardTypes[0] > 0 && cardTypes[12] > 0 && cardTypes[11] > 0 && cardTypes[10] > 0 && cardTypes[9] > 0 && foundFlush) { rank = 1; }
 
-            rank = 1;
-        }
+        // Set the rank for this player object
+        player.setRank(rank);
 
-        return rank;
+        return;
 
     }
-
-    // Take in the winners current pot, add their winnings, deplete pot to 0
-    public int returnWinnings(int winnerAmount) {
-        winnerAmount += potValue;
-        potValue = 0;
-        return winnerAmount;
-    }
-
 
 }

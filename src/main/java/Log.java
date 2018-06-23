@@ -31,7 +31,7 @@ public class Log {
         setupWriters();
         bw.write("AI Players: ");
         for (Player cpuPlayer : cpuPlayers) {
-            bw.write(cpuPlayer.getName() + ", ");
+            bw.write(", " + cpuPlayer.getName());
         }
         bw.write("\n");
         bw.close();
