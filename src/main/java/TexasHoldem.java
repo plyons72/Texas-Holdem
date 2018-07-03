@@ -9,21 +9,32 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.nio.ByteOrder;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.border.Border;
 
 
 public class TexasHoldem {
 
     private static final int WINDOW_WIDTH = 950;
     private static final int WINDOW_HEIGHT = 750;
+    private static final int DEFAULT_CARD_WIDTH = 90;
+    private static final int DEFAULT_CARD_HEIGHT= 120;
+    private static final int SMALL_CARD_WIDTH = 60;
+    private static final int SMALL_CARD_HEIGHT= 80;
+    private static String img = "src/img/"; // address of the img folder
+    private static String BACKGROUND_COLOR = "#008000"; //
 
     // for user betting methods
     public static int userBetNumber = 0;
     public static int cpuBetNumber = 0;
+
     public static boolean userBetStatus = false;
 
-    private static String img = "src/img/"; // address of the img folder
+    // For GUI card size
+    private static int cardWidth;
+    private static int cardHeight;
 
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
@@ -41,7 +52,10 @@ public class TexasHoldem {
         do {
             validNum = true;
             try {
-                numCPUs = Integer.valueOf(JOptionPane.showInputDialog(null, "Welcome to Texas Holdem!\nHow many opponents would you like to face (between 1 and 7 only)"));
+                String numPlayerString = JOptionPane.showInputDialog(null, "Welcome to Texas Holdem!\nHow many opponents would you like to face (between 1 and 7 only)");
+                if(numPlayerString == null)
+                    System.exit(0); // debug: if user click "Cancel", exit program instead of get into error check loop
+                numCPUs = Integer.valueOf(numPlayerString);
             }catch(NumberFormatException e){
                 numCPUs = -1;
             }
@@ -52,6 +66,8 @@ public class TexasHoldem {
 
         } while (!validNum);
         username = JOptionPane.showInputDialog(null, "What is your name?: ");
+        if(username == null)
+            System.exit(0); // debug: if user click "Cancel", exit program
 
         int[] dealerCards = new int[5];
         for (int i = 0; i < 5; i++)
@@ -177,7 +193,7 @@ public class TexasHoldem {
 
     //runs until a bet has been made and then returns the amount the player bets (or -1 to fold)
     //has to take in the player, the buttons, and the text field 
-    public static void userBet(Player player, JButton raiseButton, JTextArea raiseArea, JButton callButton, JButton foldButton) {
+    public static void userBet(Player player, JButton raiseButton, JTextField amountOfMoney, JButton callButton, JButton foldButton) {
 
     	//this should check if the play is in too
     	while(!TexasHoldem.userBetStatus){
@@ -186,7 +202,7 @@ public class TexasHoldem {
     		raiseButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					String userBetInput = raiseArea.getText();
+					String userBetInput = amountOfMoney.getText();
 					//TODO: check for only ints
 					//TODO: check for call number in order to add that to raise number
 					//TODO: allow player to re-bet if they put in an amount too high (or negative)
@@ -248,7 +264,15 @@ public class TexasHoldem {
 
     }
 
-    TexasHoldem(int numCPUs, Player player, Player[] cpuPlayer, Dealer dealer, Deck deck) {
+    TexasHoldem(int numCPUs, Player player, Player[] cpuPlayer, Dealer dealer, Deck deck)  {
+        // if there are more than or equal to 6 player, use smaller cards
+        if(cpuPlayer.length >= 6){
+            cardWidth = SMALL_CARD_WIDTH;
+            cardHeight = SMALL_CARD_HEIGHT;
+        }else{
+            cardWidth = DEFAULT_CARD_WIDTH;
+            cardHeight = DEFAULT_CARD_HEIGHT;
+        }
 
 
         try
@@ -263,54 +287,90 @@ public class TexasHoldem {
 
         catch (IOException e) { e.printStackTrace(); }
 
+        // new variable called allPlayerStatus, boolean[], to store the status of each player
+        // initialize player status to be all "in" (i.e. true)
+        boolean[] allPlayerStatus = new boolean[numCPUs];
+        for(int i = 0; i < numCPUs; i++){
+            allPlayerStatus[i] = true;
+        }
+
         // Gets cards for human player
         int [] humanPlayerDeck = player.getCards();
 
         // Get cards for flop, turn, and river
         int[] sharedDeck = dealer.getFTR();
 
-        //initializing window
+        // Initialize all variables for GUI
         JFrame windowFrame = new JFrame("Texas Holdem");
+        JPanel topPanel = new JPanel();
+        JPanel middlePanel = new JPanel();
+        JPanel bottomPanel = new JPanel();
+        //initializing buttons and text fields
+        JButton raiseButton = new JButton("Raise");
+        setupButton(raiseButton);
+        JTextField amountOfMoney = new JTextField("0");
+        amountOfMoney.setVisible(true);
+        amountOfMoney.setBackground(Color.BLUE);
+        amountOfMoney.setForeground(Color.WHITE);
+        JButton callButton = new JButton("Call");
+        setupButton(callButton);
+        JButton foldButton = new JButton("Fold");
+        setupButton(foldButton);
+        JLabel potMoneyLabel = new JLabel();
+        potMoneyLabel.setText("POT: $" + dealer.getWinnings());
+        potMoneyLabel.setVerticalAlignment(SwingConstants.CENTER);
+        potMoneyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        potMoneyLabel.setFont(new Font("Consolas", Font.BOLD, 14));
+        potMoneyLabel.setForeground(Color.BLUE);
+
+        //calling method to draw all panels
+
+        drawTopPanel(topPanel,cpuPlayer, allPlayerStatus,false);
+        drawMiddlePanel(middlePanel,sharedDeck,false,false,false);
+        drawBottomPanel(bottomPanel,player,amountOfMoney,raiseButton,callButton,foldButton,potMoneyLabel);
+
+        //drawBottomPanel();
+        //draw window frame
         windowFrame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         windowFrame.setVisible(true);
 
         //initializing panels
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new FlowLayout());
-        topPanel.setBackground(Color.decode("#63d39b"));
-        JPanel middlePanel = new JPanel();
-        middlePanel.setLayout(new FlowLayout());
-        middlePanel.setBackground(Color.decode("#3d9061"));
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new GridLayout(1, numCPUs));
-        bottomPanel.setBackground(Color.decode("#336d50"));
 
-        // initializing panel for sharedCards      
+        /*topPanel.setLayout(new FlowLayout());
+        topPanel.setBackground(Color.decode("#63d39b"));*/
+
+        /*middlePanel.setLayout(new FlowLayout());
+        middlePanel.setBackground(Color.decode("#3d9061"));
+
+        bottomPanel.setLayout(new GridLayout(1, numCPUs));
+        bottomPanel.setBackground(Color.decode("#336d50"));*/
+
+       /* // initializing panel for sharedCards
         ImageIcon sharedCard0 = new ImageIcon(img + "backOfCard.png");
         ImageIcon sharedCard1 = new ImageIcon(img + "backOfCard.png");
         ImageIcon sharedCard2 = new ImageIcon(img + "backOfCard.png");
         ImageIcon sharedCard3 = new ImageIcon(img + "backOfCard.png");
-        ImageIcon sharedCard4 = new ImageIcon(img + "backOfCard.png");
+        ImageIcon sharedCard4 = new ImageIcon(img + "backOfCard.png");*/
 
-        // creating JLabel with sharedCards
+        /*// creating JLabel with sharedCards
         JLabel displaysharedCard0 = new JLabel(sharedCard0);
         JLabel displaysharedCard1 = new JLabel(sharedCard1);
         JLabel displaysharedCard2 = new JLabel(sharedCard2);
         JLabel displaysharedCard3 = new JLabel(sharedCard3);
         JLabel displaysharedCard4 = new JLabel(sharedCard4);
-
-        // adding sharedCards to topPanel
+*/
+        /*// adding sharedCards to topPanel
         topPanel.add(displaysharedCard0);
         topPanel.add(displaysharedCard1);
         topPanel.add(displaysharedCard2);
         topPanel.add(displaysharedCard3);
-        topPanel.add(displaysharedCard4);
+        topPanel.add(displaysharedCard4);*/
 
-        // initializing panel for CPUPlayers
-        JPanel[] playerPanel = new JPanel[numCPUs];
+        /*// initializing panel for CPUPlayers
+        JPanel[] playerPanel = new JPanel[numCPUs];*/
 
-        // initializing panel for humanPlayer
+        /*// initializing panel for humanPlayer
         JPanel humanPlayerPanel = new JPanel(new BorderLayout());
         ImageIcon humanPlayerCard0 = new ImageIcon(img + humanPlayerDeck[0] + ".png");
         ImageIcon humanPlayerCard1 = new ImageIcon(img + humanPlayerDeck[1] + ".png");
@@ -325,48 +385,27 @@ public class TexasHoldem {
         humanPlayerPanel.add(humanPlayerName, BorderLayout.NORTH);
         humanPlayerPanel.add(displayHumanCard0, BorderLayout.WEST);
         humanPlayerPanel.add(displayHumanCard1, BorderLayout.EAST);
+*/
 
 
-        //initializing buttons and fields
-        JButton raiseButton = new JButton("Raise");
-        raiseButton.setVisible(true);
-        raiseButton.setHorizontalAlignment(SwingConstants.LEFT);
-        raiseButton.setVerticalAlignment(SwingConstants.CENTER);
-    	JTextArea raiseArea = new JTextArea("0");
-    	raiseArea.setVisible(true);
-    	raiseArea.setBackground(Color.BLUE);
-        raiseArea.setForeground(Color.WHITE);
-        JButton callButton = new JButton("Call");
-        callButton.setVisible(true);
-        callButton.setHorizontalAlignment(SwingConstants.LEFT);
-        callButton.setVerticalAlignment(SwingConstants.CENTER);
-        JButton foldButton = new JButton("Fold");
-        foldButton.setVisible(true);
-        foldButton.setHorizontalAlignment(SwingConstants.LEFT);
-        foldButton.setVerticalAlignment(SwingConstants.CENTER);
 
-        //adding buttons and fields to panels
+        /*//adding buttons and fields to panels
         middlePanel.add(raiseButton);
-        middlePanel.add(raiseArea);
+        middlePanel.add(amountOfMoney);
         middlePanel.add(callButton);
-        middlePanel.add(foldButton);
+        middlePanel.add(foldButton);*/
 
-        // initializing texts
+        /*// initializing texts
         // display amount of money in the pot
-        JLabel potMoneyLabel = new JLabel();
-        potMoneyLabel.setText("POT: $" + dealer.getWinnings());
-        potMoneyLabel.setVerticalAlignment(SwingConstants.CENTER);
-        potMoneyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        potMoneyLabel.setFont(new Font("Consolas", Font.BOLD, 14));
-        potMoneyLabel.setForeground(Color.BLUE);
 
-        // Player names
+*/
+        /*// Player names
         JLabel[] playerNames = new JLabel[numCPUs];
 
         // adding texts to panel
-        middlePanel.add(potMoneyLabel);
+        middlePanel.add(potMoneyLabel);*/
 
-        // add the names of CPUs to playerPanel
+        /*// add the names of CPUs to playerPanel
         for (int i = 0; i < numCPUs; i++) {
             // player card image
             ImageIcon backOfDeck = new ImageIcon(img + "backOfDeck.png");
@@ -380,16 +419,17 @@ public class TexasHoldem {
             playerPanel[i].add(playerNames[i]);
             playerPanel[i].add(playerCardImage);
             bottomPanel.add(playerPanel[i]);
-        }
+        }*/
 
         //adding panels to frame
         windowFrame.add(topPanel, BorderLayout.NORTH);
         windowFrame.add(middlePanel, BorderLayout.CENTER);
         windowFrame.add(bottomPanel, BorderLayout.SOUTH);
-        windowFrame.add(humanPlayerPanel, BorderLayout.WEST);
+        /*windowFrame.add(humanPlayerPanel, BorderLayout.WEST);*/
 
 
         // Update frame
+        windowFrame.pack();
         windowFrame.setVisible(true);
 
         // Used to check if we've already shown the flop and turn
@@ -405,7 +445,7 @@ public class TexasHoldem {
             int[] cpuRank = new int[numCPUs];
             int playerRank;
 
-            userBet(player, raiseButton, raiseArea, callButton, foldButton);
+            userBet(player, raiseButton, amountOfMoney, callButton, foldButton);
             for (int i = 0; i < numCPUs; i++) {
                 cpuBet(cpuPlayer[i]);
             }
@@ -429,55 +469,19 @@ public class TexasHoldem {
 
             // Check if we revealed flop, if not, reveal, and set var to true
             if (!flopSet) {
-                // Reassign the shared card variables, recreate display labels, repaint
-                sharedCard0 = new ImageIcon(img + sharedDeck[0] + ".png");
-                sharedCard1 = new ImageIcon(img + sharedDeck[1] + ".png");
-                sharedCard2 = new ImageIcon(img + sharedDeck[2] + ".png");
-
-                topPanel.remove(displaysharedCard0);
-                topPanel.remove(displaysharedCard1);
-                topPanel.remove(displaysharedCard2);
-
-                displaysharedCard0 = new JLabel(sharedCard0);
-                displaysharedCard1 = new JLabel(sharedCard1);
-                displaysharedCard2 = new JLabel(sharedCard2);
-
-                topPanel.add(displaysharedCard0);
-                topPanel.add(displaysharedCard1);
-                topPanel.add(displaysharedCard2);
-
-                topPanel.repaint();
-
+                revealFlop(middlePanel,sharedDeck);
                 flopSet = true;
             }
 
             // Check if we revealed turn, if not, reveal, and set var to true
             else if(!turnSet){
-                // Reassign the shared card variables, recreate display labels, repaint
-                sharedCard3 = new ImageIcon(img + sharedDeck[3] + ".png");
-
-                topPanel.remove(displaysharedCard3);
-
-                displaysharedCard3 = new JLabel(sharedCard3);
-
-                topPanel.add(displaysharedCard3);
-
-                topPanel.repaint();
-
+                revealTurn(middlePanel,sharedDeck);
                 turnSet = true;
             }
 
             // Check if we revealed river, if not, reveal, and set var to true, and exit
             else {
-                sharedCard4 = new ImageIcon(img + sharedDeck[4] + ".png");
-
-                topPanel.remove(displaysharedCard4);
-
-                displaysharedCard4 = new JLabel(sharedCard4);
-
-                topPanel.add(displaysharedCard4);
-
-                topPanel.repaint();
+                revealRiver(middlePanel,sharedDeck);
 
                 for(int i = 0; i < numCPUs; i++)
                 {
@@ -492,18 +496,7 @@ public class TexasHoldem {
 
 
                 // Show all the CPU cards
-                for(int i = 0; i < numCPUs; i++) {
-
-                    //get and display the CPU's cards
-                    JLabel displayCpuCard[] = new JLabel[2];
-                    displayCpuCard = getCpuCards(cpuPlayer[i]);
-
-                    playerPanel[i].removeAll();
-                    playerPanel[i].add(displayCpuCard[0]);
-                    playerPanel[i].add(displayCpuCard[1]);
-                    playerPanel[i].repaint();
-
-                }
+                drawTopPanel(topPanel,cpuPlayer, allPlayerStatus,true);
 
                 // Keep track of index for winning player (highest rank)
                 // -1 corresponds to player
@@ -560,35 +553,151 @@ public class TexasHoldem {
                 }
 
                 for (int i = 0; i < numCPUs; i++) {
-
                     //check if the player is in
-                    if (cpuPlayer[i].getIn()) {
-
-                        ImageIcon backOfCard = new ImageIcon(img + "backOfCard.png");
-                        JLabel faceDownCard = new JLabel(backOfCard);
-                        playerPanel[i].removeAll();
-                        playerPanel[i].add(faceDownCard);
-                        playerPanel[i].add(faceDownCard);
-
-                    }
-
+                    allPlayerStatus[i] = cpuPlayer[i].getIn();
                 }
+                drawTopPanel(topPanel,cpuPlayer, allPlayerStatus,false);
 
-                humanPlayerPanel.removeAll();
-
-                humanPlayerCard0 = new ImageIcon(img + humanPlayerDeck[0] + ".png");
-                humanPlayerCard1 = new ImageIcon(img + humanPlayerDeck[1] + ".png");
-                displayHumanCard0 = new JLabel(humanPlayerCard0);
-                displayHumanCard1 = new JLabel(humanPlayerCard1);
-
-
-                humanPlayerPanel.add(humanPlayerName, BorderLayout.NORTH);
-                humanPlayerPanel.add(displayHumanCard0, BorderLayout.WEST);
-                humanPlayerPanel.add(displayHumanCard1, BorderLayout.EAST);
+                drawBottomPanel(bottomPanel,player,amountOfMoney,raiseButton,callButton,foldButton,potMoneyLabel);
             }
 
 
         }
 
+    }
+
+    private void drawBottomPanel(JPanel bottomPanel, Player userPlayer, JTextField money, JButton raise, JButton call, JButton fold,JLabel pot) {
+        bottomPanel.removeAll();
+        //bottomPanel.setPreferredSize(new Dimension(WINDOW_WIDTH,250));
+        bottomPanel.setLayout(new GridBagLayout());
+        // User Player Panel
+        JPanel playerPanel = new JPanel();
+        playerPanel.setBackground(Color.decode(BACKGROUND_COLOR));
+        playerPanel.setLayout(new BorderLayout());
+        playerPanel.add(new JLabel(userPlayer.getName()), BorderLayout.NORTH); // Name
+        playerPanel.add(getResizableCardLabel(userPlayer.getCards()[0], DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT),BorderLayout.WEST);
+        playerPanel.add(getResizableCardLabel(userPlayer.getCards()[1], DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT),BorderLayout.EAST);
+
+        // Buttons
+        JPanel buttonsPanel = new JPanel();
+        bottomPanel.setBackground(Color.decode(BACKGROUND_COLOR));
+        buttonsPanel.setLayout(new FlowLayout());
+        //money.setAlignmentY(Component.CENTER_ALIGNMENT);
+        JLabel dollarSign = new JLabel("$");
+        money.setColumns(6);
+        buttonsPanel.add(dollarSign);
+        buttonsPanel.add(money);
+
+        buttonsPanel.add(raise);
+        buttonsPanel.add(call);
+        buttonsPanel.add(fold);
+        buttonsPanel.add(pot);
+        buttonsPanel.setBackground(Color.decode(BACKGROUND_COLOR));
+
+        // Put things together
+        GridBagConstraints c = new GridBagConstraints();
+        //c.fill = GridBagConstraints.WEST;
+        bottomPanel.add(playerPanel,c);
+        //c.fill = GridBagConstraints.EAST;
+        bottomPanel.add(buttonsPanel,c);
+    }
+
+    private void drawMiddlePanel(JPanel middlePanel, int[] sharedDeck, boolean showFlop, boolean showTurn, boolean showRiver) {
+        middlePanel.removeAll();
+        middlePanel.setPreferredSize(new Dimension(WINDOW_WIDTH,250));
+        middlePanel.setBackground(Color.decode(BACKGROUND_COLOR));
+        middlePanel.setLayout(new GridBagLayout());
+        JPanel sharedDeckPanel = new JPanel();
+        sharedDeckPanel.setBackground(Color.decode(BACKGROUND_COLOR));
+        // Flop
+        for (int i = 0; i < 3; i++) {
+            if (showFlop) {
+                sharedDeckPanel.add(getResizableCardLabel(sharedDeck[i], DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT));
+            } else {
+                sharedDeckPanel.add(getResizableCardBackLabel(DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT));
+            }
+        }
+        // Turn
+        if (showTurn) {
+            sharedDeckPanel.add(getResizableCardLabel(sharedDeck[3], DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT));
+        } else {
+            sharedDeckPanel.add(getResizableCardBackLabel(DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT));
+        }
+        // River
+        if (showRiver) {
+            sharedDeckPanel.add(getResizableCardLabel(sharedDeck[4], DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT));
+        } else {
+            sharedDeckPanel.add(getResizableCardBackLabel(DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT));
+        }
+        // Put things together
+        middlePanel.add(sharedDeckPanel, new GridBagConstraints());
+    }
+
+    private void drawTopPanel(JPanel topPanel, Player[] cpuPlayers,boolean[] allPlayerStatus, boolean showCard) {
+        topPanel.removeAll();
+        topPanel.setPreferredSize(new Dimension(WINDOW_WIDTH, 250));
+        topPanel.setBackground(Color.decode(BACKGROUND_COLOR));
+        topPanel.setLayout(new GridBagLayout());
+        int numPlayers = cpuPlayers.length;
+        JPanel[] playerPanels = new JPanel[numPlayers];
+        for (int i = 0; i < numPlayers; i++) {
+            playerPanels[i] = new JPanel(new BorderLayout());
+            /*JTextArea playerName = new JTextArea();
+            playerName.setText(cpuPlayers[i].getName());
+            playerName.setFont(new Font("Times New Roman",Font.PLAIN,12));*/
+            JLabel nameLabel = new JLabel(cpuPlayers[i].getName());
+            //nameLabel.setVerticalAlignment(JLabel.BOTTOM);
+            playerPanels[i].add(nameLabel, BorderLayout.NORTH);
+            playerPanels[i].setBackground(Color.decode(BACKGROUND_COLOR));
+            if (allPlayerStatus[i]) {
+
+                if (showCard) {
+                    playerPanels[i].add(getResizableCardLabel(cpuPlayers[i].getCards()[0], cardWidth, cardHeight), BorderLayout.WEST);
+                    playerPanels[i].add(getResizableCardLabel(cpuPlayers[i].getCards()[1], cardWidth, cardHeight), BorderLayout.EAST);
+                } else {
+                    playerPanels[i].add(getResizableCardBackLabel(cardWidth, cardHeight), BorderLayout.WEST);
+                    playerPanels[i].add(getResizableCardBackLabel(cardWidth, cardHeight), BorderLayout.EAST);
+                }
+            }
+            else{
+                JLabel outLabel = new JLabel("OUT");
+                outLabel.setFont(new Font("Arial",Font.BOLD,16));
+                playerPanels[i].add(outLabel,BorderLayout.SOUTH);
+            }
+            //playerPanels[i].setPreferredSize(new Dimension(2*DEFAULT_CARD_WIDTH,DEFAULT_CARD_HEIGHT+130));
+            topPanel.add(playerPanels[i], new GridBagConstraints());
+        }
+
+    }
+
+    private JLabel getResizableImageLabel(String filename, int width, int height) {
+        ImageIcon card1 = new ImageIcon(filename);
+        Image image = card1.getImage();
+        Image newImg = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        card1.setImage(newImg);
+        return new JLabel(card1);
+    }
+
+    private JLabel getResizableCardLabel(int card, int width, int height) {
+        return getResizableImageLabel(img+card+".png",width,height);
+    }
+    private JLabel getResizableCardBackLabel(int width, int height) {
+        return getResizableImageLabel(img+"backOfCard.png",width,height);
+    }
+
+    private void setupButton(JButton button){
+        button.setVisible(true);
+        button.setHorizontalAlignment(SwingConstants.LEFT);
+        button.setVerticalAlignment(SwingConstants.CENTER);
+    }
+
+    private void revealFlop(JPanel middlePanel, int[] sharedDeck){
+        drawMiddlePanel(middlePanel,sharedDeck,true,false,false);
+    }
+    private void revealTurn(JPanel middlePanel, int[] sharedDeck){
+        drawMiddlePanel(middlePanel,sharedDeck,true,true,false);
+    }
+    private void revealRiver(JPanel middlePanel, int[] sharedDeck){
+        drawMiddlePanel(middlePanel,sharedDeck,true,true,true);
     }
 }
