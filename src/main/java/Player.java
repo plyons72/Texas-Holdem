@@ -12,6 +12,7 @@ public class Player
     private int[] playerCards;
     private String playerName;
     private boolean playerIn;
+    private int playerBet;
 
 
     // Basic blank constructor
@@ -20,16 +21,18 @@ public class Player
         playerName = null;
         playerMoney = 1000;
         playerIn = true;
+        playerBet = 0;
     }
 
     // Create a player object with their name, amount, and starting cards
-    public Player(String name, int amount, int[] cards, boolean in, int rank)
+    public Player(String name, int amount, int[] cards, boolean in, int rank, int bet)
     {
         playerName = name;
         playerMoney = amount;
         playerCards = cards;
         playerIn = true;
         playerRank = rank;
+        playerBet = bet;
 
     }
 
@@ -57,7 +60,15 @@ public class Player
     //Sets the cards a player has
     public void setIn(boolean in) { playerIn = in; }
 
+    //Sets the rank a player has
     public void setRank(int rank) { playerRank = rank; }
 
+    //Gets the cards a player has
     public int getRank() { return playerRank; }
+
+    //Sets the num a player has bet this round
+    public void setBet(int bet) { playerBet = bet; }
+
+    //Gets the num a player has bet this round
+    public int getBet() { return playerBet; }
 }

@@ -28,9 +28,9 @@ public class TexasHoldem {
 
     // for user betting methods
     public static int userBetNumber = 0;
-    public static int cpuBetNumber = 0;
-
     public static boolean userBetStatus = false;
+
+    public static int betPerPlayer = 0; // used to determine what the required bet is to be "in" 
 
     // For GUI card size
     private static int cardWidth;
@@ -86,8 +86,8 @@ public class TexasHoldem {
         }
 
 
-        // Creates new player with name username, $1000, starting cards, in status true, and rank in game
-        Player player = new Player(username, 1000, playerCards, true, 10);
+        // Creates new player with name username, $1000, starting cards, in status true, rank in game, and bet for this round
+        Player player = new Player(username, 1000, playerCards, true, 0, 0);
 
         // Creates array of CPU players
         Player[] cpuPlayer = new Player[numCPUs];
@@ -105,8 +105,8 @@ public class TexasHoldem {
                 cpuCards[j] = deck.dealCard();
             }
 
-            //Instantiate cpu object with their name, starting amount, cards, in status true, and rank in game
-            cpuPlayer[i] = new Player(cpuNames[i], 1000, cpuCards, true, 10);
+            //Instantiate cpu object with their name, starting amount, cards, in status true, rank in game, and bet for this round
+            cpuPlayer[i] = new Player(cpuNames[i], 1000, cpuCards, true, 0, 0);
         }
 
         TexasHoldem texasHoldem = new TexasHoldem(numCPUs, player, cpuPlayer, dealer, deck);
@@ -232,32 +232,74 @@ public class TexasHoldem {
 
     	}
 
-    	//user folded
-    	if(TexasHoldem.userBetNumber == -1){
+    	//user raised
+    	if(TexasHoldem.userBetNumber > 0){
 
-    		TexasHoldem.userBetNumber = -1;
-    		player.setIn(false);
-    		
+    		//set user bet equal to raise + call
+    		player.setBet(TexasHoldem.userBetNumber + TexasHoldem.betPerPlayer);
+    		player.removeBetAmount(TexasHoldem.userBetNumber + TexasHoldem.betPerPlayer);
 
     	}
 
-    	// Otherwise, remove their bet from their pot.
-    	else {
-    	    player.removeBetAmount(userBetNumber);
-        }
+    	//user called
+    	if(TexasHoldem.userBetNumber == 0){
+
+    		//set user bet equal to call
+    		player.setBet(TexasHoldem.betPerPlayer);
+    		player.removeBetAmount(TexasHoldem.betPerPlayer);
+
+    	}
+
+    	//user folded
+    	else if(TexasHoldem.userBetNumber == -1){
+
+    		player.setBet(0);
+    		player.setIn(false);
+
+    	}
 
     }
 
     //very basic cpu brain that controls the passed in cpu's bet based on the user's last bet
     public static void cpuBet(Player cpuPlayer) {
 
-    	//if user called or folded, cpus call
-    	if(TexasHoldem.userBetNumber == 0){ TexasHoldem.cpuBetNumber = 0; }
+    	Random random = new Random();
 
-    	//if user bet cpus fold
-    	else if(TexasHoldem.userBetNumber > 0){
+    	//pick a random number between 1 and 3
+    	int cpuRando = random.nextInt(3) + 1;
 
-    		TexasHoldem.cpuBetNumber = 0;
+    	//cpu raises
+    	if(cpuRando == 1){
+
+    		//randomly pick a number to bet based on player's money and current bet amount
+    		int betNum = random.nextInt(cpuPlayer.getMoney() - TexasHoldem.betPerPlayer + 1) + TexasHoldem.betPerPlayer;
+
+    		//set the player's bet number
+    		cpuPlayer.setBet(betNum);
+
+    		//set that bet to the new required bet
+    		TexasHoldem.betPerPlayer = betNum;
+
+    		//set player's money
+    		cpuPlayer.removeBetAmount(betNum);
+
+    	}
+
+    	//cpu calls
+    	else if(cpuRando == 2){
+
+    		//just set the player's bet to the minimum required bet
+    		cpuPlayer.setBet(TexasHoldem.betPerPlayer);
+
+    		//set player's money
+    		cpuPlayer.removeBetAmount(TexasHoldem.betPerPlayer);
+
+    	}
+
+    	//cpu fold
+    	else if(cpuRando == 3){
+
+    		cpuPlayer.setBet(0);
     		cpuPlayer.setIn(false);
     		
     	}
