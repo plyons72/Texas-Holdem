@@ -87,7 +87,7 @@ public class TexasHoldem {
 
 
         // Creates new player with name username, $1000, starting cards, in status true, and rank in game
-        Player player = new Player(username, 1000, playerCards, true, 0);
+        Player player = new Player(username, 1000, playerCards, true, 10);
 
         // Creates array of CPU players
         Player[] cpuPlayer = new Player[numCPUs];
@@ -106,7 +106,7 @@ public class TexasHoldem {
             }
 
             //Instantiate cpu object with their name, starting amount, cards, in status true, and rank in game
-            cpuPlayer[i] = new Player(cpuNames[i], 1000, cpuCards, true, 0);
+            cpuPlayer[i] = new Player(cpuNames[i], 1000, cpuCards, true, 10);
         }
 
         TexasHoldem texasHoldem = new TexasHoldem(numCPUs, player, cpuPlayer, dealer, deck);
@@ -460,12 +460,12 @@ public class TexasHoldem {
 
                 for (int i = 0; i < numCPUs; i++)
                 {
-                    cpuPlayer[i].setRank(12);
+                    cpuPlayer[i].setRank(-1);
                 }
             }
 
             // User folded. Have all the AIs call
-            else { player.setRank(12); }
+            else { player.setRank(-1); }
 
             // Check if we revealed flop, if not, reveal, and set var to true
             if (!flopSet) {
@@ -505,11 +505,11 @@ public class TexasHoldem {
                 for (int i = 0; i < numCPUs; i++) {
 
                     if (winner == -1) {
-                        if (cpuPlayer[i].getRank() < player.getRank()) { winner = i; }
+                        if (cpuPlayer[i].getRank() > player.getRank()) { winner = i; }
                     }
 
                     else {
-                        if (cpuPlayer[i].getRank() < cpuPlayer[winner].getRank()){
+                        if (cpuPlayer[i].getRank() > cpuPlayer[winner].getRank()){
                             winner = i;
                         }
                     }
