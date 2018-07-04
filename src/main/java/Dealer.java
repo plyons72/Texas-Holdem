@@ -5,6 +5,8 @@ Alex McMullen
 Gary Xu
 */
 
+import java.util.Arrays;
+
 public class Dealer {
 
     // Holds the current value in the pot
@@ -27,162 +29,243 @@ public class Dealer {
     public int getWinnings() { return potValue; }
     public int[] getFTR() { return ftr; }
 
+    /* Rank hands and compare later to determine a winner
+    /*****   10 - Royal Flush
+    /*****   9 - Straight Flush
+    /*****   8 - Four of a kind
+    /*****   7 - Full House
+    /*****   6 - Flush
+    /*****   5 - Straight
+    /*****   4 - Three of a Kind
+    /*****   3 - Two Pair
+    /*****   2 - One Pair
+    /*****   1 - High Card
+    */
+
     // Takes in an array of player cards
-    public void determineRank(Player player){
+    public void determineRank(Player player) {
 
-        // Holds a rank 1 through 9 to give to the user, and be compared later to determine a winner
-        /*
-            1 - Royal Flush
-            2 - Straight Flush
-            3 - Four of a kind
-            4 - Full House
-            5 - Flush
-            6 - Straight
-            7 - Three of a Kind
-            8 - Two Pair
-            9 - One Pair
-            10 - High Card
-        */
-
-        // Check to see if the player rank is 12, indicating that they folded
+        // Check to see if the player rank is -1, indicating that they folded
         // If they folded, just return
-        if (player.getRank() == 12) { return; }
+        if (player.getRank() == -1) {
+            return;
+        }
 
         // Local variable to hold the rank to set
-        int rank = 12;
-
-        // Check to see if we've already found a pair, if so, we have 2 pair, or full house
-        boolean foundPair = false;
-
-        // Check to see if we've found 3 of a kind, used to check for full house
-        boolean found3 = false;
-
-        // Check for a flush to see if we have a straight flush or royal flush later
-        boolean foundFlush = false;
-
-        boolean foundStraightFlush = false;
+        int rank = 10;
 
         // Cards that a user has at their disposal to make winning combo with
-        int[] cardArray = new int[7];
-
-        // Each index corresponds to a card value. 0 = A, 12 = King
-        int[] cardTypes = {0,0,0,0,0,0,0,0,0,0,0,0,0};
-
-        // Check to see if we have a flush
-        int[] suitArray = {0,0,0,0};
+        int[] availableCards = new int[7];
 
         // Holds cards that only this player has
         int[] playerCards = player.getCards();
-        cardArray[0] = playerCards[0];
-        cardArray[1] = playerCards[1];
+        availableCards[0] = playerCards[0];
+        availableCards[1] = playerCards[1];
 
         // Create an array of the cards in an individuals pool to check for a win.
         for (int i = 2; i < 7; i++) {
-            cardArray[i] = ftr[i-2];
+            availableCards[i] = ftr[i - 2];
         }
 
-        // Finds the value of the card between 0 and 12
-        for(int i = 0; i < cardArray.length; i++) {
-            cardTypes[cardArray[i] % 13]++;
+        //******************* Find Card Values *******************//
+        // Each index corresponds to a card value. 0 = A, 12 = King
+        int[] valueArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+        // Finds the value of the cards in a user's pool between 0 and 12
+        // Increments index corresponding to that value if found in availableCards[]
+        for (int i = 0; i < availableCards.length; i++) {
+            valueArray[availableCards[i] % 13]++;
         }
+        //******************* Find Card Values *******************//
+
+
+        //******************* Find Card Suits *******************//
+        // Used to reference # of cards per suit, to check for Flush
+        int[] suitArray = {0, 0, 0, 0};
 
         // Build array to check for flush;
-        for(int i = 0; i < suitArray.length; i++) {
-            int suiteNum = (cardArray[i] - 1) / 13;
+        for (int i = 0; i < suitArray.length; i++) {
+            int suiteNum = (availableCards[i] - 1) / 13;
             suitArray[suiteNum]++;
         }
+        //******************* Find Card Suits *******************//
 
+        boolean royalFlush = checkRoyalFlush(availableCards);
+
+        boolean straightFlush = checkStraightFlush(availableCards);
+
+        // Check to see if we have 4 of a kind
+        boolean fourOfKind = checkFourOfKind(valueArray);
+
+        // Check to see if we've found 3 of a kind. Also used to check for full house
+        boolean threeOfKind = checkThreeOfKind(valueArray);
+
+        // Should be 1 if we find 1 pair, 2 if we find 2 pair
+        int numPairs = checkPairs(valueArray);
+
+        // Check to see if we have a pair, and a three of a kind, if so, we have a full house
+        boolean fullHouse = (numPairs > 0 && threeOfKind);
+
+        // Check for a flush
+        boolean flush = checkFlush(suitArray);
+
+        // Check for a straight
+        boolean straight = checkStraight(valueArray);
+
+
+        // Appropriately set the rank
+        if (royalFlush) {
+            player.setRank(10);
+        }
+
+        else if (straightFlush) {
+            player.setRank(9);
+        }
+
+        else if (fourOfKind) {
+            player.setRank(8);
+        }
+
+        else if (fullHouse) {
+            player.setRank(7);
+        }
+
+        else if (flush) {
+            player.setRank(6);
+        }
+
+        else if (straight) {
+            player.setRank(5);
+        }
+
+        else if (threeOfKind) {
+            player.setRank(4);
+        }
+
+        else if (numPairs == 2) {
+            player.setRank(3);
+        }
+
+        else if (numPairs == 1) {
+            player.setRank(2);
+        }
+
+        else{
+            player.setRank(1);
+        }
+
+
+    }
+
+    // Check for pairs in our 5 card hand
+    // @return the number of pairs between 0 and 2
+    private int checkPairs(int[] cards) {
+
+        int numPairs = 0;
+
+        // If we find a pair, increment the number of pairs we've found
+        for (int i = 0; i < cards.length; i++) {
+
+            if(cards[i] == 2){
+                numPairs++;
+            }
+        }
+        
+        // Texas Holdem is played with a "Best 5 card hand" schema in mind. We can have 3 pairs, but only 2 will count.
+        if (numPairs > 2) numPairs = 2;
+        return numPairs;
+    }
+
+
+    // Check if we have 3 of a kind in our array
+    // @return true if so
+    private boolean checkThreeOfKind(int[] cards) {
+        for (int i = 0; i < cards.length; i++) {
+
+            if(cards[i] == 3){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    // Check if we have 4 of a kind in our array
+    // @return true if so
+    private boolean checkFourOfKind(int[] cards) {
+
+        for (int i = 0; i < cards.length; i++) {
+
+            if(cards[i] == 4){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    // Check for 5 cards of the same suit (flush)
+    // @return true if there is a flush
+    private boolean checkFlush(int[] cards) {
         // Check for flush
-        for (int i = 0; i < suitArray.length; i++)
+        for (int i = 0; i < cards.length; i++)
         {
-            if (suitArray[i] == 5 && rank > 5) {
-                rank = 5;
-                foundFlush = true;
+            if (cards[i] == 5) {
+                return true;
             }
         }
+        return false;
+    }
 
-        // Check for pairs, 3 of a kind, 4 of a kind
-        for(int i = 0; i < cardTypes.length; i++) {
 
-            switch (cardTypes[i]) {
-
-                // If there is a case where we have a pair, our rank goes to 9
-                // If we already found a pair, and this is the second one, we have 2 pair
-                // Make sure we didnt already find something better
-                case 2:
-                    // Check for 2 pair
-                    if (foundPair) {
-                        if (rank > 8) { rank = 8; }
-                    }
-                    // Check for full house
-                    else if (found3) {
-                         if (rank > 4) { rank = 4; }
-                    }
-
-                    // Else they have a pair
-                    else {
-                        if (rank > 9) {
-                            rank = 9;
-                        }
-                        foundPair = true;
-                    }
-                    break;
-
-                // 3 of a kind
-                case 3:
-                    if (rank > 7) {
-                        rank = 7;
-                    }
-
-                    // Check for full house
-                    if (foundPair) {
-                        if(rank > 4){ rank = 4; }
-                    }
-                    break;
-
-                case 4:
-                    if (rank > 3) {
-                        rank = 3;
-                    }
-                    break;
-
-                //We have a high card
-                default:
-                    if (rank > 10) {
-                        rank = 10;
-                    }
-                    break;
-            }
-
+    // Check if we have a straight
+    // @return true if so
+    private boolean checkStraight(int[] cards) {
+        for (int i = 0; i < cards.length - 5; i++)
+        {
+            if (cards[i] > 0 && cards[i + 1] > 0 && cards[i + 2] > 0 && cards[i + 3] > 0 && cards[i + 4] > 0)
+                return true;
         }
+        return false;
+    }
 
-        // This is a bit of a hacky way to check for straight flush, or royal straight flush, as we can have
-        // a flush without those 5 cards being our straight cards. Fix this later.
 
-        //TODO: Accurately check for a straight flush. Straights should still be fine
-        // Check for straight, straight flush
-        for (int i = 0; i < cardTypes.length - 5; i++) {
-            if (cardTypes[i] > 0 && cardTypes[i + 1] > 0 &&
-                    cardTypes[i + 2] > 0 && cardTypes[i+3] > 0 && cardTypes[i+4] > 0) {
-
-                // We have a straight. If we also have a flush, it's likely we have a straight flush
-                if(foundFlush) { if (rank > 2) { rank = 2; } }
-
-                // Found a straight otherwise
-                else {
-                    if (rank > 6) { rank = 6; }
-                }
+    // Check if we have a straight flush in our original array (so we can make sure we have a flush condition)
+    // @return true if so
+    private boolean checkStraightFlush(int[] cards) {
+        Arrays.sort(cards);
+        for (int i = 0; i < 3; i++) {
+            if ( (cards[i] == (cards[i + 1] - 1)) &&
+                    (cards[i] == (cards[i + 2] - 2)) &&
+                    (cards[i] == (cards[i + 3] - 3)) &&
+                    (cards[i] == (cards[i + 4] - 4)) ) {
+                return true;
             }
         }
+        return false;
+    }
 
-        // Check for royal flush
-        if(cardTypes[0] > 0 && cardTypes[12] > 0 && cardTypes[11] > 0 && cardTypes[10] > 0 && cardTypes[9] > 0 && foundFlush) { rank = 1; }
 
-        // Set the rank for this player object
-        player.setRank(rank);
+    // Check if we have a royal flush in our original array (so we can make sure we have a flush condition)
+    // @return true if so
+    private boolean checkRoyalFlush(int[] cards) {
 
-        return;
+        // Sort the array so the cards will be in increasing order
+        Arrays.sort(cards);
 
+        // Checks for royal flush in all cases with all 7 cards
+        for (int i = 0; i < 3; i++) {
+            if(cards[i] == 9 && cards[i + 1] == 10 && cards[i + 2] == 11 && cards[i + 3] == 12 && cards[i+4] == 13)
+                return true;
+            else if(cards[i] == 22 && cards[i + 1] == 23 && cards[i + 2] == 24 && cards[i + 3] == 25 && cards[i+4] == 26)
+                return true;
+            else if(cards[i] == 35 && cards[i + 1] == 36 && cards[i + 2] == 37 && cards[i + 3] == 38 && cards[i+4] == 39)
+                return true;
+            else if(cards[i] == 48 && cards[i + 1] == 49 && cards[i + 2] == 50 && cards[i + 3] == 51 && cards[i+4] == 52)
+                return true;
+        }
+
+        return false;
     }
 
 }
