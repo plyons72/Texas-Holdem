@@ -429,6 +429,7 @@ public class TexasHoldem {
         windowFrame.pack();
         windowFrame.setVisible(true);
 
+
         // Used to check if we've already shown the flop and turn
         boolean flopSet = false;
         boolean turnSet = false;
@@ -436,16 +437,43 @@ public class TexasHoldem {
         // Used to check if the game is over
         boolean endGame = false;
 
+        LinkedList<Player> order = new LinkedList<Player>();
+        order.add(player);
+        for (int i = 0; i<cpuPlayer.length; i++)
+        {
+            order.add(cpuPlayer[i]);
+        }
+        Player smallBlind = order.get(order.size()-2);
+        Player bigBlind = order.getLast();
+
+
         // Run the game
         while(!endGame) {
 
+
             int[] cpuRank = new int[numCPUs];
             int playerRank;
+            smallBlind.removeBetAmount(10);
+            dealer.increaseWinnings(10);
+            bigBlind.removeBetAmount(20);
+            dealer.increaseWinnings(20);
+            for (int i = 0; i < order.size(); i++) {
+                Player curPlayer = order.get(i);
+                if (curPlayer == player)
+                {
+                    userBet(player, raiseButton, amountOfMoney, callButton, foldButton);
+                }
+                else
+                {
+                    cpuBet(order.get(i));
+                }
+            }
 
-            userBet(player, raiseButton, amountOfMoney, callButton, foldButton);
+            //Commenting out for now. Turn order and playing is now handled above
+            /*userBet(player, raiseButton, amountOfMoney, callButton, foldButton);
             for (int i = 0; i < numCPUs; i++) {
                 cpuBet(cpuPlayer[i]);
-            }
+            }*/
 
             // Check to see if the user made a bet
             // If so, increase the pot by that amount, set bet status to false to allow future bets, and have AIs fold
@@ -558,6 +586,11 @@ public class TexasHoldem {
                 drawBottomPanel(bottomPanel,player,amountOfMoney,raiseButton,callButton,foldButton,potMoneyLabel);
             }
 
+            order.addLast(order.getFirst());
+            order.removeFirst();
+
+            smallBlind = order.get(order.size()-2);
+            bigBlind = order.getLast();
 
         }
 
