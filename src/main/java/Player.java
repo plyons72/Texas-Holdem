@@ -14,16 +14,6 @@ public class Player
     private boolean playerIn;
     private int playerBet;
 
-
-    // Basic blank constructor
-    public Player()
-    {
-        playerName = null;
-        playerMoney = 1000;
-        playerIn = true;
-        playerBet = 0;
-    }
-
     // Create a player object with their name, amount, and starting cards
     public Player(String name, int amount, int[] cards, boolean in, int rank, int bet)
     {
