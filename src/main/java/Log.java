@@ -1,8 +1,6 @@
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Date;
+import java.util.Scanner;
 import java.util.TimeZone;
 
 public class Log {
@@ -154,6 +152,35 @@ public class Log {
         }
         cardName = cardName + suit;
         return cardName;
+    }
+
+    public void updatePlayerStatus(String playerName, boolean win, int moneyWon) throws IOException {
+        new File("game_log").mkdir();
+        File playerStatusFile = new File("game_log/log_"+playerName+".txt");
+        FileWriter PSFW = new FileWriter(playerStatusFile);
+        BufferedWriter PSBW = new BufferedWriter(PSFW);
+        Scanner S = new Scanner(playerStatusFile);
+        String name = playerName;
+        int round = 1;
+        int numWins = 0 ;
+        int totalMoneyWon = 0;
+        if(S.hasNext()){ // not a new/empty file
+            name = S.nextLine();
+            round = Integer.valueOf(S.nextLine());
+            numWins = Integer.valueOf(S.nextLine());
+            totalMoneyWon = Integer.valueOf(S.nextLine());
+        }
+        PSBW.write(name);
+        PSBW.write(round+1);
+        if(win){
+            PSBW.write(numWins+1);
+            PSBW.write(totalMoneyWon+moneyWon);
+        }else{
+            PSBW.write(numWins);
+            PSBW.write(totalMoneyWon);
+        }
+
+        PSBW.close();
     }
 
 
