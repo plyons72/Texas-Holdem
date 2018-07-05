@@ -265,6 +265,9 @@ public class TexasHoldem {
     }
 
     TexasHoldem(int numCPUs, Player player, Player[] cpuPlayer, Dealer dealer, Deck deck)  {
+        // new variable to store the number of round (starting from 1)
+        int hand = 1;
+
         // if there are more than or equal to 6 player, use smaller cards
         if(cpuPlayer.length >= 6){
             cardWidth = SMALL_CARD_WIDTH;
@@ -274,7 +277,7 @@ public class TexasHoldem {
             cardHeight = DEFAULT_CARD_HEIGHT;
         }
 
-
+        // setup log
         try
         {
             Log log = new Log();
@@ -282,7 +285,7 @@ public class TexasHoldem {
             log.printUserName(player);
             log.printCPUNames(cpuPlayer);
             log.printCardDealt(player,cpuPlayer);
-            log.printHand(1);
+            log.printHand(hand);
         }
 
         catch (IOException e) { e.printStackTrace(); }
@@ -309,19 +312,13 @@ public class TexasHoldem {
         JButton raiseButton = new JButton("Raise");
         setupButton(raiseButton);
         JTextField amountOfMoney = new JTextField("0");
-        amountOfMoney.setVisible(true);
-        amountOfMoney.setBackground(Color.BLUE);
-        amountOfMoney.setForeground(Color.WHITE);
+        setupMoneyField(amountOfMoney);
         JButton callButton = new JButton("Call");
         setupButton(callButton);
         JButton foldButton = new JButton("Fold");
         setupButton(foldButton);
         JLabel potMoneyLabel = new JLabel();
-        potMoneyLabel.setText("POT: $" + dealer.getWinnings());
-        potMoneyLabel.setVerticalAlignment(SwingConstants.CENTER);
-        potMoneyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        potMoneyLabel.setFont(new Font("Consolas", Font.BOLD, 14));
-        potMoneyLabel.setForeground(Color.BLUE);
+        setupPotLabel(potMoneyLabel,dealer);
 
         //calling method to draw all panels
 
@@ -566,6 +563,16 @@ public class TexasHoldem {
 
     }
 
+    /**
+     * Method drawing the bottom panel, including the userPlayer and the buttons and texts. Should be called to update whenever someone add money to the pot
+     * @param bottomPanel The bottom panel to update
+     * @param userPlayer The Player class object of user player
+     * @param money The textField to enter amount of money to bet or raise
+     * @param raise The raise button
+     * @param call The call button
+     * @param fold The fold button
+     * @param pot The pot amout label(Should be updated when ever someone bets)
+     */
     private void drawBottomPanel(JPanel bottomPanel, Player userPlayer, JTextField money, JButton raise, JButton call, JButton fold,JLabel pot) {
         bottomPanel.removeAll();
         //bottomPanel.setPreferredSize(new Dimension(WINDOW_WIDTH,250));
@@ -602,6 +609,14 @@ public class TexasHoldem {
         bottomPanel.add(buttonsPanel,c);
     }
 
+    /**
+     * Method drawing the meddle panel, including the 5 community cards
+     * @param middlePanel The middlePanel to update
+     * @param sharedDeck the int[] sharedDeck of the 5 cards
+     * @param showFlop boolean if showing first 3 cards
+     * @param showTurn boolean if showing the 4th card
+     * @param showRiver boolean if showing the 5th card
+     */
     private void drawMiddlePanel(JPanel middlePanel, int[] sharedDeck, boolean showFlop, boolean showTurn, boolean showRiver) {
         middlePanel.removeAll();
         middlePanel.setPreferredSize(new Dimension(WINDOW_WIDTH,250));
@@ -633,6 +648,13 @@ public class TexasHoldem {
         middlePanel.add(sharedDeckPanel, new GridBagConstraints());
     }
 
+    /**
+     * Method drawing the top panel, including all the CPU players, with option to specify IN or OUT, and showing card or not
+     * @param topPanel top panel to update
+     * @param cpuPlayers Player[] of all the cpu player
+     * @param allPlayerStatus array storing the status of IN or OUT of all players
+     * @param showCard determine if the cards face up or down
+     */
     private void drawTopPanel(JPanel topPanel, Player[] cpuPlayers,boolean[] allPlayerStatus, boolean showCard) {
         topPanel.removeAll();
         topPanel.setPreferredSize(new Dimension(WINDOW_WIDTH, 250));
@@ -670,6 +692,7 @@ public class TexasHoldem {
 
     }
 
+    // Method to make Resizable Image JLabel
     private JLabel getResizableImageLabel(String filename, int width, int height) {
         ImageIcon card1 = new ImageIcon(filename);
         Image image = card1.getImage();
@@ -677,27 +700,47 @@ public class TexasHoldem {
         card1.setImage(newImg);
         return new JLabel(card1);
     }
-
+    // make card label of int Card
     private JLabel getResizableCardLabel(int card, int width, int height) {
         return getResizableImageLabel(img+card+".png",width,height);
     }
+
+    // make card back label
     private JLabel getResizableCardBackLabel(int width, int height) {
         return getResizableImageLabel(img+"backOfCard.png",width,height);
     }
 
+    // simplifying code
     private void setupButton(JButton button){
         button.setVisible(true);
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setVerticalAlignment(SwingConstants.CENTER);
     }
 
+    // method to redraw the middle panel showing Flop
     private void revealFlop(JPanel middlePanel, int[] sharedDeck){
         drawMiddlePanel(middlePanel,sharedDeck,true,false,false);
     }
+    // method to redraw the middle panel showing Flop and Turn
     private void revealTurn(JPanel middlePanel, int[] sharedDeck){
         drawMiddlePanel(middlePanel,sharedDeck,true,true,false);
     }
+    // method to redraw the middle panel showing Flop, Turn and River(all 5 cards)
     private void revealRiver(JPanel middlePanel, int[] sharedDeck){
         drawMiddlePanel(middlePanel,sharedDeck,true,true,true);
+    }
+    // setup pot label
+    private void setupPotLabel(JLabel potLabel,Dealer dealer){
+        potLabel.setText("POT: $" + dealer.getWinnings());
+        potLabel.setVerticalAlignment(SwingConstants.CENTER);
+        potLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        potLabel.setFont(new Font("Consolas", Font.BOLD, 14));
+        potLabel.setForeground(Color.BLUE);
+    }
+    // setup money field
+    private void setupMoneyField(JTextField moneyField){
+        moneyField.setVisible(true);
+        moneyField.setBackground(Color.BLUE);
+        moneyField.setForeground(Color.WHITE);
     }
 }
