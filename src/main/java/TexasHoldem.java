@@ -416,6 +416,12 @@ public class TexasHoldem {
                                JButton callButton, JButton foldButton, int numRaises, LinkedList<Player> order,
                                Player smallBlind, Player bigBlind) {
 
+        if (player.getRank() == -1)
+        {
+            userBetStatus = true;
+            userBetNumber = -1;
+        }
+
         //this should check if the play is in too
         while(!userBetStatus){
 
@@ -509,7 +515,7 @@ public class TexasHoldem {
         if(cpuFunction == 1){
 
             //randomly pick a number to bet based on player's money and current bet amount
-            int betNum = random.nextInt(cpuTotal - betPerPlayer + 1) + betPerPlayer;
+            int betNum = 20;
 
             //set that bet to the new required bet
             betPerPlayer += betNum;
