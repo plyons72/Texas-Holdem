@@ -24,11 +24,21 @@ public class TexasHoldem {
     private static String img = "src/img/"; // address of the img folder
     private static String BACKGROUND_COLOR = "#008000"; //
 
-    // for user betting methods
-    public static int userBetNumber = 0;
-    public static boolean userBetStatus = false;
+    // Determines current call amount
+    public static int amountToCall = 0;
 
-    public static int betPerPlayer = 0; // used to determine what the required bet is to be "in" 
+    // Holds the number of players who have called, and are ready to end betting
+    public static int numUsersCalled;
+
+    // Holds the number of players who have folded, and are ready to end betting
+    public static int numUsersFolded;
+
+
+    // Holds function performed by a player, or their bet amount
+    public static int playerFunction;
+
+    // Determines whether or not user has selected a button
+    public static boolean userBetStatus = false;
 
     // For GUI card size
     private static int cardWidth;
@@ -297,6 +307,9 @@ public class TexasHoldem {
         // Max 3 raises per betting interval as per Hoyle's Rules
         int numRaises = 0;
 
+        // Holds the number of players who have called/folded so far
+        // Keep track of whether or not we will need to go back through the loop again
+        int numCalled = 0;
 
         LinkedList<Player> order = new LinkedList<Player>();
         order.add(player);
@@ -318,18 +331,31 @@ public class TexasHoldem {
             bigBlind.removeBetAmount(20);
             dealer.increaseWinnings(20);
 
-            for (int i = 0; i < order.size(); i++) {
-                Player curPlayer = order.get(i);
-                if (curPlayer == player)
-                {
-                    userBet(player, dealer, raiseButton, amountOfMoney, callButton, foldButton, numRaises,
-                            order, smallBlind, bigBlind);
+            do {
+                for (int i = 0; i < order.size(); i++) {
+                    Player curPlayer = order.get(i);
+                    if (curPlayer == player)
+                    {
+                        // Make sure user didn't fold
+                        if (curPlayer.getRank() != -1) {
+                            userBet(player, dealer, raiseButton, amountOfMoney, callButton, foldButton, numRaises,
+                                    order, smallBlind, bigBlind);
+                        }
+                    }
+                    else
+                    {
+                        // Make sure user didn't fold
+                        if (curPlayer.getRank() != -1) { cpuBet(order.get(i), dealer, numRaises); }
+                    }
+                    // If everyone is done, break out of loop and reset the num called and folded
+                    if (numUsersCalled + numUsersFolded == validCPUs.size()) {
+                        stillBetting = false;
+                        numUsersCalled = 0;
+                        numUsersFolded = 0;
+                    }
                 }
-                else
-                {
-                    cpuBet(order.get(i), dealer, numRaises);
-                }
-            }
+            }while (stillBetting);
+
 
             // Check if we revealed flop, if not, reveal, and set var to true
             if (!flopSet) {
@@ -416,34 +442,41 @@ public class TexasHoldem {
                                JButton callButton, JButton foldButton, int numRaises, LinkedList<Player> order,
                                Player smallBlind, Player bigBlind) {
 
+        // Skip betting if player folded
         if (player.getRank() == -1)
         {
             userBetStatus = true;
-            userBetNumber = -1;
+            playerFunction = -1;
         }
+
+        int playerTotal = player.getMoney();
 
         //this should check if the play is in too
         while(!userBetStatus){
 
-            //check if user has pressed raise button
-            raiseButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent arg0) {
-                    String userBetInput = amountOfMoney.getText();
-                    //TODO: check for only ints
-                    //TODO: check for call number in order to add that to raise number
-                    //TODO: allow player to re-bet if they put in an amount too high (or negative)
-                    userBetNumber = Integer.parseInt(userBetInput);
-                    userBetStatus = true;
-                }
-            });
+            // Only allow raising if it has been less than 3 times
+            if (numRaises < 3) {
+
+                //check if user has pressed raise button
+                raiseButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent arg0) {
+                        String userBetInput = amountOfMoney.getText();
+                        //TODO: check for only ints
+                        //TODO: allow player to re-bet if they put in an amount too high (or negative)
+                        playerFunction = Integer.parseInt(userBetInput);
+                        userBetStatus = true;
+                    }
+                });
+
+            }
 
             //check if user has pressed call button
             callButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
                     //later this needs to set value equal to the current call value, not 0
-                    userBetNumber = 0;
+                    playerFunction = 0;
                     userBetStatus = true;
                 }
             });
@@ -452,20 +485,21 @@ public class TexasHoldem {
             foldButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
-                    userBetNumber = -1;
+                    playerFunction = -1;
                     userBetStatus = true;
                 }
             });
 
         }
 
+
         // User raised. Remove that raise and the call amounts from their pot, and add to main pot
-        if(userBetNumber > 0 && numRaises < 3){
+        if(playerFunction > 0){
             // User bets the called amount plus their bet
-            player.removeBetAmount(userBetNumber + betPerPlayer);
+            player.removeBetAmount(playerFunction + amountToCall);
 
             // Change the amount to be bet by each player
-            betPerPlayer += userBetNumber;
+            amountToCall += playerFunction;
 
             order.addLast(order.getFirst());
             order.removeFirst();
@@ -474,23 +508,39 @@ public class TexasHoldem {
             bigBlind = order.getLast();
 
             // Increase the pot
-            dealer.increaseWinnings(betPerPlayer);
+            dealer.increaseWinnings(amountToCall);
 
             // Increment raises
             numRaises++;
+            numUsersCalled = 1;
+
 
         }
 
         // User called. Remove that bet from their pot, and add to main pot
-        if(userBetNumber == 0){
-            player.removeBetAmount(betPerPlayer);
-            dealer.increaseWinnings(betPerPlayer);
+        if(playerFunction == 0){
+            // Remove the call amount from the player's pool
+            if (playerTotal >= amountToCall) {
+                player.removeBetAmount(amountToCall);
+                System.out.println(player.getName() + " called for  " + amountToCall);
+                dealer.increaseWinnings(amountToCall);
+            }
+            // player is going all in, but can't actually match the amount called
+            // need to lower the amount to call
+            else {
+                player.removeBetAmount(playerTotal);
+                System.out.println(player.getName() + " is going all in with " + playerTotal);
+                amountToCall = playerTotal;
+                dealer.increaseWinnings(amountToCall);
+            }
+            numUsersCalled++;
         }
 
         // User folded. Set rank to -1, and setIn status to false
-        else if(userBetNumber == -1){
+        else if(playerFunction == -1){
             player.setIn(false);
             player.setRank(-1);
+            numUsersFolded++;
         }
 
         // Set back to false before exiting, to allow future bets
@@ -498,54 +548,82 @@ public class TexasHoldem {
 
     }
 
-    //very basic cpu brain that controls the passed in cpu's bet based on the user's last bet
+    // Randomly selects the function that a cpu will perform this turn (raise, call, or fold), keeping restrictions
+    // (number of raises, cpu's total earnings, etc.) in mind
     public static void cpuBet(Player cpuPlayer, Dealer dealer, int numRaises) {
 
-        Random random = new Random();
+        Random rand = new Random();
 
-        //pick a random number between 1 and 3
-        int cpuFunction = random.nextInt(3) + 1;
+        // Randomly select the type of turn the cpu will make
+        int cpuFunction = rand.nextInt(3) + 1;
         int cpuTotal = cpuPlayer.getMoney();
 
-        // Just have CPU call if the max number of raises has been hit
-        if (numRaises == 3 && cpuFunction == 1) { cpuFunction++; };
+        // Holds the range from which to pick the value to raise
+        int betRange = 0;
 
+        // If there have been 3 raises, don't let the cpu raise again
+        if (numRaises >= 3 && cpuFunction == 1) { cpuFunction = rand.nextInt(1) + 2; }
 
-        // Raise
-        if(cpuFunction == 1){
-
-            //randomly pick a number to bet based on player's money and current bet amount
-            int betNum = 20;
-
-            //set that bet to the new required bet
-            betPerPlayer += betNum;
-
-            // Remove money equal to the call amount and the raised amount
-            cpuPlayer.removeBetAmount(betPerPlayer);
-            dealer.increaseWinnings(betPerPlayer);
-
-            System.out.println("CPU raised bet to " + betPerPlayer);
-
+        // If the cpu has more cash than the amount needed to call, allows the cpu to raise
+        // CPU can raise the pot by a total of half of their max earnings
+        // Else, if the cpu is set to raise, changes that to a different function, randomly
+        if(cpuTotal > amountToCall) { betRange = (cpuTotal - amountToCall) / 2; }
+        else {
+            if (cpuFunction == 1) { cpuFunction = rand.nextInt(1) + 2; }
         }
 
-        // Call
-        else if(cpuFunction == 2){
 
-            //set player's money
-            cpuPlayer.removeBetAmount(betPerPlayer);
-            System.out.println("CPU Called for  " + betPerPlayer);
-            dealer.increaseWinnings(betPerPlayer);
+        switch (cpuFunction) {
+            // Raise
+            case 1:
+                //
+                int betNum = rand.nextInt(betRange) + 1;
 
-        }
+                //set that bet to the new required bet
+                amountToCall += betNum;
 
-        // Fold
-        else if(cpuFunction == 3){
+                // Remove money equal to the call amount and the raised amount
+                cpuPlayer.removeBetAmount(amountToCall);
 
-            cpuPlayer.setIn(false);
-            cpuPlayer.setRank(-1);
+                // Increase the total pot
+                dealer.increaseWinnings(amountToCall);
 
-            System.out.println("CPU Folded");
+                System.out.println(cpuPlayer.getName() + " raised bet to " + amountToCall);
 
+                numUsersCalled = 1;
+                break;
+
+            // Call
+            case 2:
+
+                // Remove the call amount from the cpu's pool
+                if (cpuTotal >= amountToCall) {
+                    cpuPlayer.removeBetAmount(amountToCall);
+                    System.out.println(cpuPlayer.getName() + " called for  " + amountToCall);
+                    dealer.increaseWinnings(amountToCall);
+                }
+                // CPU is going all in, but can't actually match the amount called
+                // need to lower the bet per player
+                else {
+                    cpuPlayer.removeBetAmount(cpuTotal);
+                    System.out.println(cpuPlayer.getName() + " is going all in with " + cpuTotal);
+                    amountToCall = cpuTotal;
+                    dealer.increaseWinnings(amountToCall);
+                }
+
+                numUsersCalled++;
+
+                break;
+
+
+            // Fold
+            case 3:
+
+                cpuPlayer.setIn(false);
+                cpuPlayer.setRank(-1);
+                System.out.println(cpuPlayer.getName() + " folded");
+                numUsersFolded++;
+                break;
         }
 
     }
