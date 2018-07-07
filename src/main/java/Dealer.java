@@ -21,13 +21,21 @@ public class Dealer {
         ftr = cards;
     }
 
-    // Setters
+    // Add bet amounts to the pot
     public void addToPot(int bet) { potValue += bet; }
+
+    // Set the flop turn and river each round
     public void setFTR(int[] cards) { ftr = cards; }
 
-    // Getters
+    // Gets the amount in the pot
     public int getWinnings() { return potValue; }
+
+    // Gets the cards the dealer has
     public int[] getFTR() { return ftr; }
+
+    // Resets the pot after each game
+    public void refreshPot() {potValue = 0;}
+
 
     /* Rank hands and compare later to determine a winner
     /*****   10 - Royal Flush
