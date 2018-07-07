@@ -33,10 +33,10 @@ public class Player
     public int getMoney() { return playerMoney; }
 
     // Sets the amount of money a player has
-    public void removeBetAmount(int amount) { playerMoney -= amount; }
+    public void removeBetAmount(final int amount) { playerMoney -= amount; }
 
     // Sets the amount of money a player has
-    public void increaseWinnings(int amount) { playerMoney += amount; }
+    public void increaseWinnings(final int amount) { playerMoney += amount; }
 
     //Sets the cards a player has
     public void setCards(int[] cards) { playerCards = cards; }

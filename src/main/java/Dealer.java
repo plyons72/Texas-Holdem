@@ -22,8 +22,8 @@ public class Dealer {
     }
 
     // Setters
-    public void increaseWinnings(int bet) { potValue += bet; }
-    public void setSharedCards(int[] cards) { ftr = cards; }
+    public void addToPot(int bet) { potValue += bet; }
+    public void setFTR(int[] cards) { ftr = cards; }
 
     // Getters
     public int getWinnings() { return potValue; }
