@@ -10,7 +10,7 @@ public class Player
     private int playerMoney;
     private int playerRank;
     private int[] playerCards;
-    private String playerName;
+    private final String playerName;
     private boolean playerIn;
     private int playerBet;
 
@@ -20,7 +20,7 @@ public class Player
         playerName = name;
         playerMoney = amount;
         playerCards = cards;
-        playerIn = true;
+        playerIn = in;
         playerRank = rank;
         playerBet = bet;
 
@@ -33,13 +33,16 @@ public class Player
     public int getMoney() { return playerMoney; }
 
     // Sets the amount of money a player has
-    public void removeBetAmount(final int amount) { playerMoney -= amount; }
+    public void removeBetAmount(int amount) {
+        playerMoney -= amount; }
 
     // Sets the amount of money a player has
-    public void increaseWinnings(final int amount) { playerMoney += amount; }
+    public void increaseWinnings(int amount) {
+        playerMoney += amount; }
 
     //Sets the cards a player has
-    public void setCards(int[] cards) { playerCards = cards; }
+    public void setCards(int[] cards) {
+        playerCards = cards; }
 
     //Gets the cards a player has
     public int[] getCards() { return playerCards; }
@@ -48,16 +51,19 @@ public class Player
     public boolean getIn() { return playerIn; }
 
     //Sets the cards a player has
-    public void setIn(boolean in) { playerIn = in; }
+    public void setIn(boolean in) {
+        playerIn = in; }
 
     //Sets the rank a player has
-    public void setRank(int rank) { playerRank = rank; }
+    public void setRank(int rank) {
+        playerRank = rank; }
 
     //Gets the cards a player has
     public int getRank() { return playerRank; }
 
     //Sets the num a player has bet this round
-    public void setBet(int bet) { playerBet = bet; }
+    public void setBet(int bet) {
+        playerBet = bet; }
 
     //Gets the num a player has bet this round
     public int getBet() { return playerBet; }
