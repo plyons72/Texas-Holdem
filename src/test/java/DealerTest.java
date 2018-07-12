@@ -10,18 +10,6 @@ public class DealerTest {
     private static final int[] SAMPLE_CARDS = {16, 24, 11, 12, 13};
     private static final int[] SAMPLE_CARDS_FOR_STRAIGHT = {1, 2, 3, 12, 13};
     private static final int[] SAMPLE_CARDS_FOR_FOUR = {1, 14, 27, 12, 13};
-    @Test
-    public void testIncreaseWinnings() {
-        int bet = 50;
-        int starting = 1000;
-        Dealer testDealer = new Dealer(starting,SAMPLE_ROYAL_FLUSH_1);
-        boolean isRight = false;
-        testDealer.increaseWinnings(bet);
-        if(testDealer.getWinnings() == bet+starting){
-            isRight = true;
-        }
-        assertEquals(isRight,true);
-    }
 
     @Test
     public void testDetermineRank(){
@@ -30,7 +18,7 @@ public class DealerTest {
         //public Player(String name, int amount, int[] cards, boolean in, int rank)
         Player player = new Player("TestingPlayer", 1000, new int[]{9,10},true,0, 0);
         int starting = 1000;
-        Dealer testDealer = new Dealer(starting,SAMPLE_CARDS);
+        Dealer testDealer = new Dealer(starting, DealerTest.SAMPLE_CARDS);
         testDealer.determineRank(player);
         passRoyalFlush = (player.getRank() == 10);
         System.out.println("passRoyalFlush = "+passRoyalFlush);
@@ -38,14 +26,14 @@ public class DealerTest {
         // Test 2: Straight Flush
         boolean passStraightFlush;
         player = new Player("TestingPlayer", 1000, new int[]{4,5},true,0, 0);
-        testDealer = new Dealer(starting,SAMPLE_CARDS_FOR_STRAIGHT);
+        testDealer = new Dealer(starting, DealerTest.SAMPLE_CARDS_FOR_STRAIGHT);
         testDealer.determineRank(player);
         passStraightFlush = (player.getRank() == 9);
         System.out.println("passStraightFlush = "+passStraightFlush);
         // Test 3: Four of a kind
         boolean passFourOfAKind;
         player = new Player("TestingPlayer", 1000, new int[]{40,51},true,0, 0);
-        testDealer = new Dealer(starting,SAMPLE_CARDS_FOR_FOUR);
+        testDealer = new Dealer(starting, DealerTest.SAMPLE_CARDS_FOR_FOUR);
         testDealer.determineRank(player);
         passFourOfAKind = (player.getRank() == 8);
         System.out.println("passFourOfAKind = "+passFourOfAKind);

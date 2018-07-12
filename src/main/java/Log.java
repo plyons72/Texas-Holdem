@@ -13,8 +13,8 @@ public class Log {
         new Log("Texas_Holdem_log.txt");
     }
 
-    public Log(String filename) throws IOException {
-        F = new File(filename);
+    public Log(String filename) {
+        Log.F = new File(filename);
     }
 
     public void printStartGame() throws IOException {
@@ -30,14 +30,15 @@ public class Log {
         bw.write("AI Players: ");
         for (int i = 0; i < cpuPlayers.length; i++) {
             bw.write(cpuPlayers[i].getName());
-            if(i < cpuPlayers.length - 1) { bw.write(", "); }
+            if(i < cpuPlayers.length - 1) {
+                bw.write(", "); }
         }
         bw.write("\n");
         bw.close();
     }
 
     private void setupWriters() throws IOException {
-        fw = new FileWriter(F, true);
+        fw = new FileWriter(Log.F, true);
         bw = new BufferedWriter(fw);
     }
 
@@ -134,7 +135,7 @@ public class Log {
                 break;
         }
         if (value <= 9) { // 2 to 10
-            cardName = "" + (value + 1);
+            cardName = Integer.toString(value + 1);
         } else {
             switch (value) {
                 case 10:
@@ -150,7 +151,7 @@ public class Log {
                     cardName = "A";
             }
         }
-        cardName = cardName + suit;
+        cardName += suit;
         return cardName;
     }
 
