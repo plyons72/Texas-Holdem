@@ -26,6 +26,9 @@ public class TexasHoldem {
     private static String img = "src/img/"; // address of the img folder
     private static String BACKGROUND_COLOR = "#008000"; //
     private static boolean timeEnabled = true;
+    private static boolean heckleEnabled = true;
+
+    public static String oldInsult = "starter insult";
 
     // Used to update the text field
     public static JTextArea textUpdateArea = new JTextArea("Welcome to Texas Holdem, ");
@@ -96,6 +99,24 @@ public class TexasHoldem {
             }
 
         } while (!validNum);
+
+        final JPanel modeRadioPanel = new JPanel();
+        final JRadioButton timerRadio = new JRadioButton("Timer Mode");
+        final JRadioButton heckleRadio = new JRadioButton("Heckle Mode");
+
+        modeRadioPanel.add(timerRadio);
+        modeRadioPanel.add(heckleRadio);
+
+        JOptionPane.showMessageDialog(null, modeRadioPanel);
+
+        if(!(timerRadio.isSelected())){
+            timeEnabled = false;
+        }
+
+        if(!(heckleRadio.isSelected())){
+            heckleEnabled = false;
+        }
+
         username = JOptionPane.showInputDialog(null, "What is your name?: ");
         if(username == null)
             System.exit(0); // debug: if user click "Cancel", exit program
@@ -638,7 +659,11 @@ public class TexasHoldem {
         int playerTotal = player.getMoney();
         Timer timer = new Timer();
 
-
+        // Start up the heckling if user has enabled it
+        Heckle heckle = new Heckle();
+        if(heckleEnabled){
+            heckle.start();
+        }
 
         System.out.println("\n\nIt's " + player.getName() + "'s turn!");
         System.out.println("Amount to call is " + amountToCall);
@@ -686,9 +711,14 @@ public class TexasHoldem {
             }
         });
         while (!playerBetStatus && timer.getI()> 0) {
-            if (timeEnabled)
-            {
+            if (timeEnabled){
                 timerLabel.setText(Integer.toString(timer.getI()));
+            }
+            if (heckleEnabled){
+                if(!(heckle.getInsult().equals(oldInsult))){
+                    textUpdateArea.append(heckle.getInsult());
+                    oldInsult = heckle.getInsult();
+                }
             }
         }
         timerLabel.setText("");
@@ -706,6 +736,8 @@ public class TexasHoldem {
         // User raised. Remove that raise and the call amounts from their pot, and add to main pot
         switch (playerFunction) {
             case 1:
+                 heckle.interrupt(); //don't worry about heckling until next time we call userBet
+
                 // User bets the called amount plus their bet
                 player.removeBetAmount(playerBet + amountToCall);
 
@@ -727,6 +759,7 @@ public class TexasHoldem {
                 break;
 
             case 2:
+                heckle.interrupt(); //don't worry about heckling until next time we call userBet
                 // Remove the call amount from the player's pool
                 if (playerTotal >= callDifference) {
                     player.removeBetAmount(callDifference);
@@ -748,6 +781,7 @@ public class TexasHoldem {
                 break;
 
             case 3:
+                heckle.interrupt(); //don't worry about heckling until next time we call userBet
                 player.setIn(false);
                 System.out.println(player.getName() + " folds.\n");
                 textUpdateArea.append(player.getName() + " folds.\n");
