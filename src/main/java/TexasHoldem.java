@@ -737,6 +737,7 @@ public class TexasHoldem {
         switch (playerFunction) {
             case 1:
                  heckle.interrupt(); //don't worry about heckling until next time we call userBet
+		 oldInsult = "starter insult";
 
                 // User bets the called amount plus their bet
                 player.removeBetAmount(playerBet + amountToCall);
@@ -760,6 +761,7 @@ public class TexasHoldem {
 
             case 2:
                 heckle.interrupt(); //don't worry about heckling until next time we call userBet
+		oldInsult = "starter insult";
                 // Remove the call amount from the player's pool
                 if (playerTotal >= callDifference) {
                     player.removeBetAmount(callDifference);
@@ -782,6 +784,7 @@ public class TexasHoldem {
 
             case 3:
                 heckle.interrupt(); //don't worry about heckling until next time we call userBet
+		oldInsult = "starter insult";
                 player.setIn(false);
                 System.out.println(player.getName() + " folds.\n");
                 textUpdateArea.append(player.getName() + " folds.\n");
