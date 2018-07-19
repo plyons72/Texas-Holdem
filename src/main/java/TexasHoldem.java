@@ -26,6 +26,9 @@ public class TexasHoldem {
     private static String BACKGROUND_COLOR = "#008000"; //
     private static boolean timeEnabled = true;
 
+    // Used to update the text field
+    public static JTextArea textUpdateArea = new JTextArea("Welcome to Texas Holdem, ");
+
     // Determines current call amount
     public static int amountToCall = 0;
 
@@ -245,6 +248,8 @@ public class TexasHoldem {
             log.printCPUNames(cpuPlayer);
             log.printCardDealt(player,cpuPlayer);
             log.printHand(hand);
+            textUpdateArea.append(player.getName());
+            textUpdateArea.append("!\n");
         }
 
         catch (IOException e) { e.printStackTrace(); }
@@ -353,6 +358,10 @@ public class TexasHoldem {
                 System.out.printf("\n\n%s is the dealer", symbolicDealer.getName());
                 System.out.printf("\n%s is the small blind and bet 10", smallBlind.getName());
                 System.out.printf("\n%s is the big blind and bet 20\n\n\n", bigBlind.getName());
+                textUpdateArea.append(symbolicDealer.getName() + " deals.\n");
+                textUpdateArea.append(smallBlind.getName() + " is the small blind and bet 10.\n");
+                textUpdateArea.append(bigBlind.getName() + " is the big blind and bet 20.\n");
+
             }
 
 
@@ -427,6 +436,7 @@ public class TexasHoldem {
             // Check if we revealed flop, if not, reveal, and set var to true
             if (!flopSet) {
                 System.out.println("********************SETTING FLOP********************");
+                textUpdateArea.append("\nThe dealer reveals the flop.\n");
                 revealFlop(middlePanel,sharedDeck);
                 windowFrame.repaint();
                 flopSet = true;
@@ -436,6 +446,7 @@ public class TexasHoldem {
             // Check if we revealed turn, if not, reveal, and set var to true
             else if(!turnSet){
                 System.out.println("********************SETTING TURN********************");
+                textUpdateArea.append("\nThe dealer reveals the turn.\n");
                 revealTurn(middlePanel,sharedDeck);
                 windowFrame.repaint();
                 turnSet = true;
@@ -445,6 +456,7 @@ public class TexasHoldem {
             // Reveal river, check win-con, determine winner, and start game over again
             else {
                 System.out.println("********************SETTING RIVER********************");
+                textUpdateArea.append("\nThe dealer reveals the river.\n");
                 revealRiver(middlePanel, sharedDeck);
 
                 for (int i = 0; i < validCPUs.size(); i++)
@@ -501,6 +513,7 @@ public class TexasHoldem {
                 int winnings = dealer.getWinnings();
 
                 System.out.printf("%s has won %d dollars with a %s.", winner.getName(), winnings, winningHand);
+                textUpdateArea.append(winner.getName() + " wins $" + winnings + " with " + winningHand + "!\n");
 
                 // Give the winner their money
                 finalPlayers.get(winnerIndex).increaseWinnings(winnings);
@@ -526,11 +539,13 @@ public class TexasHoldem {
                 if (validCPUs.size() == 0) {
                     endGame = true;
                     System.out.println("You won!");
+                    textUpdateArea.append("Everyone else is out. You win!\n");
                 }
                 // End the game if the player is out of money
                 if (player.getMoney() == 0) {
                     endGame = true;
                     System.out.println("You lost!");
+                    textUpdateArea.append("You're out of money. You lose!\n");
                     break;
                 }
 
@@ -671,6 +686,7 @@ public class TexasHoldem {
                 dealer.addToPot(amountToCall);
 
                 System.out.println(player.getName() + " raised the call value by " + playerBet + " to "  + amountToCall);
+                textUpdateArea.append(player.getName() + " raises by $" + playerBet + " to " + amountToCall + ".\n");
 
                 // Increment raises
                 numRaises++;
@@ -683,6 +699,7 @@ public class TexasHoldem {
                 if (playerTotal >= callDifference) {
                     player.removeBetAmount(callDifference);
                     System.out.println(player.getName() + " called for  " + amountToCall + " by adding in " + callDifference);
+                    textUpdateArea.append(player.getName() + " called on $" + amountToCall + " by adding $" + callDifference + ".\n");
                     dealer.addToPot(callDifference);
                 }
                 // Player is going all in, but can't actually match the amount called
@@ -690,6 +707,7 @@ public class TexasHoldem {
                 else {
                     player.removeBetAmount(playerTotal);
                     System.out.println(player.getName() + " is going all in with " + playerTotal);
+                    textUpdateArea.append(player.getName() + " is all in with $" + playerTotal + ".\n");
                     amountToCall = playerTotal;
                     dealer.addToPot(amountToCall);
                     returnFunds = true;
@@ -699,6 +717,8 @@ public class TexasHoldem {
 
             case 3:
                 player.setIn(false);
+                System.out.println(player.getName() + " folds.\n");
+                textUpdateArea.append(player.getName() + " folds.\n");
                 player.setRank(-1);
                 numUsersFolded++;
                 break;
@@ -761,6 +781,7 @@ public class TexasHoldem {
                 dealer.addToPot(amountToCall);
 
                 System.out.println(cpuPlayer.getName() + " raised bet to " + amountToCall);
+                textUpdateArea.append(cpuPlayer.getName() + " raises by $" + playerBet + " to " + amountToCall + ".\n");
 
                 numUsersCalled = 1;
                 numRaises++;
@@ -773,6 +794,7 @@ public class TexasHoldem {
                 if (cpuTotal >= amountToCall) {
                     cpuPlayer.removeBetAmount(amountToCall);
                     System.out.println(cpuPlayer.getName() + " called for  " + amountToCall);
+                    textUpdateArea.append(cpuPlayer.getName() + " called on $" + amountToCall + ".\n");
                     dealer.addToPot(amountToCall);
                 }
                 // CPU is going all in, but can't actually match the amount called
@@ -780,6 +802,7 @@ public class TexasHoldem {
                 else {
                     cpuPlayer.removeBetAmount(cpuTotal);
                     System.out.println(cpuPlayer.getName() + " is going all in with " + cpuTotal);
+                    textUpdateArea.append(cpuPlayer.getName() + " is all in with $" + cpuTotal + ".\n");
                     amountToCall = cpuTotal;
                     dealer.addToPot(amountToCall);
                 }
@@ -796,6 +819,7 @@ public class TexasHoldem {
                 cpuPlayer.setIn(false);
                 cpuPlayer.setRank(-1);
                 System.out.println(cpuPlayer.getName() + " folded");
+                textUpdateArea.append(cpuPlayer.getName() + " folds.\n");
                 numUsersFolded++;
                 break;
         }
@@ -866,7 +890,17 @@ public class TexasHoldem {
         middlePanel.setBackground(Color.decode(BACKGROUND_COLOR));
         middlePanel.setLayout(new GridBagLayout());
         JPanel sharedDeckPanel = new JPanel();
+        JPanel textUpdatePanel = new JPanel();
+        JScrollPane scrollPane = new JScrollPane(textUpdatePanel);
+        scrollPane.setMinimumSize(new Dimension(280, 120));
+		scrollPane.setMaximumSize(new Dimension(280, 120));
+		scrollPane.setPreferredSize(new Dimension(280, 120));
         sharedDeckPanel.setBackground(Color.decode(BACKGROUND_COLOR));
+       	textUpdatePanel.setBackground(Color.white);
+		textUpdateArea.setEditable(false);
+		textUpdateArea.setBackground(null);
+       	// Text
+       		textUpdatePanel.add(textUpdateArea);
         // Flop
         for (int i = 0; i < 3; i++) {
             if (showFlop) {
@@ -889,6 +923,7 @@ public class TexasHoldem {
         }
         // Put things together
         middlePanel.add(sharedDeckPanel, new GridBagConstraints());
+        middlePanel.add(scrollPane);
     }
 
     /**
