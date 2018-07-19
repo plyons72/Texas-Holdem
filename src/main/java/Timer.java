@@ -7,7 +7,7 @@ public class Timer extends Thread {
 
     public void run() {
 
-        while (i > 0) {
+        while (i > -1) {
             i--;
             try {
                 this.sleep(1000);
