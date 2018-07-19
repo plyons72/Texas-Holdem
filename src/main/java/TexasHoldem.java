@@ -24,7 +24,7 @@ public class TexasHoldem {
     private static final int SMALL_CARD_HEIGHT= 80;
     private static String img = "src/img/"; // address of the img folder
     private static String BACKGROUND_COLOR = "#008000"; //
-
+    private static boolean timeEnabled = true;
 
     // Determines current call amount
     public static int amountToCall = 0;
@@ -264,6 +264,7 @@ public class TexasHoldem {
 
         // Initialize all variables for GUI
         JFrame windowFrame = new JFrame("Texas Holdem");
+        JLabel timerLabel = new JLabel();
         JPanel topPanel = new JPanel();
         JPanel middlePanel = new JPanel();
         JPanel bottomPanel = new JPanel();
@@ -283,7 +284,7 @@ public class TexasHoldem {
 
         drawTopPanel(topPanel, false);
         drawMiddlePanel(middlePanel,sharedDeck,false,false,false);
-        drawBottomPanel(bottomPanel, raiseField,raiseButton,callButton,foldButton,potMoneyLabel);
+        drawBottomPanel(bottomPanel, raiseField,raiseButton,callButton,foldButton,potMoneyLabel,timerLabel);
 
         //drawBottomPanel();
         //draw window frame
@@ -371,9 +372,9 @@ public class TexasHoldem {
                     if (curPlayer.getIn()) {
                         // Update the raise/call field with the amount needed to call
                         raiseField = new JTextField(Integer.toString(amountToCall - curPlayer.getBet()), 6);
-                        drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel);
+                        drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel,timerLabel);
                         windowFrame.repaint();
-                        userBet(raiseButton, raiseField, callButton, foldButton);
+                        userBet(raiseButton, raiseField, callButton, foldButton, timeEnabled, timerLabel);
                     }
                 }
                 else {
@@ -404,9 +405,9 @@ public class TexasHoldem {
                         {
                             // Update the raise/call field with the amount needed to call
                             raiseField = new JTextField(Integer.toString(amountToCall - curPlayer.getBet()), 6);
-                            drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel);
+                            drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel, timerLabel);
                             windowFrame.repaint();
-                            userBet(raiseButton, raiseField, callButton, foldButton);
+                            userBet(raiseButton, raiseField, callButton, foldButton, timeEnabled, timerLabel);
                         }
 
                         else {
@@ -566,7 +567,7 @@ public class TexasHoldem {
                 drawTopPanel(topPanel, false);
                 drawMiddlePanel(middlePanel, dealer.getFTR(), false, false, false);
                 raiseField = new JTextField("0", 6);
-                drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel);
+                drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel, timerLabel);
                 windowFrame.repaint();
 
                 //@TODO: Add in an alert here to stop gameplay until the user presses a button to continue their turn
@@ -584,10 +585,12 @@ public class TexasHoldem {
 
     //runs until a bet has been made and then returns the amount the player bets (or -1 to fold)
     //has to take in the player, the buttons, and the text field
-    public static void userBet(JButton raiseButton, JTextField amountOfMoney, JButton callButton, JButton foldButton) {
+    public static void userBet(JButton raiseButton, JTextField amountOfMoney, JButton callButton, JButton foldButton, boolean timeEnabled, JLabel timerLabel) {
 
         // Get players current pot for reference
         int playerTotal = player.getMoney();
+        Timer timer = new Timer();
+
 
 
         System.out.println("\n\nIt's " + player.getName() + "'s turn!");
@@ -597,45 +600,60 @@ public class TexasHoldem {
         int callDifference = amountToCall - player.getBet();
 
         //this should check if the play is in too
-        while(!playerBetStatus){
+        if(timeEnabled){
+            timer.start();
+        }
+        // Only allow raising if it has been less than 3 times
+        if (numRaises <= 3) {
 
-            // Only allow raising if it has been less than 3 times
-            if (numRaises <= 3) {
-
-                //check if user has pressed raise button
-                raiseButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent arg0) {
-                        String playerBetString = amountOfMoney.getText();
-                        //TODO: check for only ints
-                        //TODO: allow player to re-bet if they put in an amount too high (or negative)
-                        playerFunction = 1;
-                        playerBet = Integer.parseInt(playerBetString);
-                        playerBetStatus = true;
-                    }
-                });
-
-            }
-
-            //check if user has pressed call button
-            callButton.addActionListener(new ActionListener() {
+            //check if user has pressed raise button
+            raiseButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
-                    playerFunction = 2;
-                    playerBetStatus = true;
-                }
-            });
-
-            //check if user has pressed fold button
-            foldButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent arg0) {
-                    playerFunction = 3;
+                    String playerBetString = amountOfMoney.getText();
+                    //TODO: check for only ints
+                    //TODO: allow player to re-bet if they put in an amount too high (or negative)
+                    playerFunction = 1;
+                    playerBet = Integer.parseInt(playerBetString);
                     playerBetStatus = true;
                 }
             });
 
         }
+
+        //check if user has pressed call button
+        callButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                playerFunction = 2;
+                playerBetStatus = true;
+            }
+        });
+
+        //check if user has pressed fold button
+        foldButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                playerFunction = 3;
+                playerBetStatus = true;
+            }
+        });
+        while (!playerBetStatus && timer.getI()> 0) {
+            if (timeEnabled)
+            {
+                timerLabel.setText(Integer.toString(timer.getI()));
+            }
+        }
+        timerLabel.setText("");
+        if(playerBetStatus)
+        {
+            timer.interrupt();
+        }
+        else
+        {
+            playerFunction = 3;
+        }
+
 
 
         // User raised. Remove that raise and the call amounts from their pot, and add to main pot
@@ -799,7 +817,7 @@ public class TexasHoldem {
      * @param fold The fold button
      * @param pot The pot amout label(Should be updated when ever someone bets)
      */
-    private void drawBottomPanel(JPanel bottomPanel, JTextField raiseField, JButton raise, JButton call, JButton fold, JLabel pot) {
+    private void drawBottomPanel(JPanel bottomPanel, JTextField raiseField, JButton raise, JButton call, JButton fold, JLabel pot, JLabel timerLabel) {
         bottomPanel.removeAll();
         bottomPanel.setLayout(new GridBagLayout());
 
@@ -825,6 +843,7 @@ public class TexasHoldem {
         buttonsPanel.add(call);
         buttonsPanel.add(fold);
         buttonsPanel.add(pot);
+        buttonsPanel.add(timerLabel);
         buttonsPanel.setBackground(Color.decode(BACKGROUND_COLOR));
 
         // Put things together
