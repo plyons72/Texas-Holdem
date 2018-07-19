@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import javax.swing.*;
 
 
@@ -489,34 +490,65 @@ public class TexasHoldem {
                 }
 
                 int winnerRank = 0;
-                int winnerIndex = 0;
+                int winnerHigh = 0;
+                ArrayList<Integer> winnerIndex = new ArrayList<Integer>();
+                winnerIndex.add(0);
 
                 // Cycles through and determines the winner
                 for (int i = 0; i < finalPlayers.size(); i++) {
 
-                    Player curPlayer = finalPlayers.get(i);
 
+                    Player curPlayer = finalPlayers.get(i);
                     int tempRank = curPlayer.getRank();
+
+                    // Stores values of cards and checks higher one
+                    int a = ((curPlayer.getCards()[0] - 1) % 13);
+                    int b = ((curPlayer.getCards()[1] - 1) % 13);
+
+                    // Stores either a or b as the higher card
+                    int tempHigh = (a > b) ? a : b;
 
                     String tempName = curPlayer.getName();
 
+                    // If there is a clear better hand, set that
                     if (tempRank > winnerRank) {
-                        winnerIndex = i;
+                        winnerIndex.clear();
+                        winnerIndex.add(i);
                         winnerRank = tempRank;
+                        winnerHigh= tempHigh;
                     }
 
-                    System.out.printf("\n%s has rank %d\n", tempName, tempRank);
+                    // If there is a tie, add to winner rank. check for real tie later
+                    if (tempRank == winnerRank) {
+                        // This user has a higher high card
+                        if (tempHigh > winnerHigh)
+                        {
+                            winnerIndex.clear();
+                            winnerIndex.add(i);
+                            winnerHigh = tempHigh;
+                        }
+
+                        // High cards match, true tie
+                        else if (tempHigh == winnerHigh) { winnerIndex.add(i); }
+
+                        // No tie, just continue
+                        else {
+
+                        }
+
+                    }
+
                 }
 
-                Player winner = finalPlayers.get(winnerIndex);
-                String winningHand = getHand(winner.getRank());
-                int winnings = dealer.getWinnings();
+                int winnings = dealer.getWinnings() / winnerIndex.size();
+                String winningHand = getHand(winnerRank);
 
-                System.out.printf("%s has won %d dollars with a %s.", winner.getName(), winnings, winningHand);
-                textUpdateArea.append(winner.getName() + " wins $" + winnings + " with " + winningHand + "!\n");
+                textUpdateArea.append(finalPlayers.get(winnerIndex.get(0)).getName() + " won $" + winnings + " with " + winningHand + "!\n");
 
-                // Give the winner their money
-                finalPlayers.get(winnerIndex).increaseWinnings(winnings);
+                // Split winnings evenly
+                for (int i = 0; i < winnerIndex.size(); i++) {
+                    finalPlayers.get(winnerIndex.get(i)).increaseWinnings(winnings);
+                }
 
                 // Set pot to 0
                 dealer.refreshPot();
@@ -731,8 +763,15 @@ public class TexasHoldem {
 
     // Randomly selects the function that a cpu will perform this turn (raise, call, or fold), keeping restrictions
     // (number of raises, cpu's total earnings, etc.) in mind
-    //@TODO: Need to slow down gameplay. In multithreaded, have each cpu correspond to a thread, and have each thread sleep for like, 3 seconds here
     public static void cpuBet(Player cpuPlayer) {
+
+        // Sleep for 3 seconds to slow gameplay down
+        try {
+            TimeUnit.SECONDS.sleep(3);
+        }
+        catch(InterruptedException e )
+        {}
+
 
         Random rand = new Random();
 
