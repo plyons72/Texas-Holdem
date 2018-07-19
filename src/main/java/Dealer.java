@@ -5,6 +5,7 @@ Alex McMullen
 Gary Xu
 */
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Dealer {
@@ -15,10 +16,83 @@ public class Dealer {
     // Holds the cards in the flop, turn, and river
     private int[] ftr;
 
+    // number of side pots (in case more than one player all-in)
+    private int numSidePots = 0;
+    private ArrayList<SidePot> sidePots = new ArrayList<>();
+
     // Starting game constructor
     public Dealer(int startingPot, int[] cards) {
         potValue = startingPot;
         ftr = cards;
+    }
+
+
+    // if the player do all-in
+    // create a side pot
+    // add all the players who bet more than the minimum into the side pot
+    // add the minimum bet to main pot
+    // add all the rest bet to side pot
+    //TODO: modify to work on multiple side pots
+    public void checkSidePot(int amountToCall, Player[] allPlayers, Player userPlayer){
+        int min = 10000;
+        int numPlayerIn = getNumInPlayers(allPlayers,userPlayer);
+        boolean needSidePot = false;
+        for(Player p : allPlayers){
+            if(p.getIn()) {
+                if(p.getAllIn()){
+                    needSidePot = true;
+                    if (p.getBet() < amountToCall && p.getBet() < min) {
+                        min = p.getBet();
+                        SidePot SP1 = new SidePot(min);
+                        sidePots.add(SP1);
+                        SP1.addToSidePot(amountToCall);
+                        //addToPot(min*numPlayerIn);
+                    }
+                }
+            }
+        }
+    }
+    /*
+    public int getMinBet(Player[] allPlayers, Player userPlayer){
+
+    }*/
+
+    public int getNumInPlayers(Player[] allPlayer, Player userPlayer){
+        int numPlayerIn=0;
+        for(int i = 0; i< allPlayer.length; i++){
+            if(allPlayer[i].getIn())
+                numPlayerIn++;
+        }
+        if(userPlayer.getIn())
+            numPlayerIn++;
+        return numPlayerIn;
+    }
+
+    // If there is a side pot
+    public boolean hasSidePot(){
+        return (numSidePots>0);
+    }
+
+    // Reset side pot; To be called after each hand if there was a side pot
+    public void resetSidePot(){
+        numSidePots = 0;
+        sidePots.clear();
+    }
+
+    private class SidePot{
+        ArrayList<Player> playersInPot = new ArrayList<>();;
+        int sidePotAmount = 0;
+        int baseAmount;
+
+        private SidePot(int minAmount){
+            baseAmount = minAmount;
+        }
+
+        //
+        private void addToSidePot(int amount){
+            sidePotAmount += amount - baseAmount;
+        }
+
     }
 
     // Add bet amounts to the pot
@@ -177,7 +251,7 @@ public class Dealer {
                 numPairs++;
             }
         }
-        
+
         // Texas Holdem is played with a "Best 5 card hand" schema in mind. We can have 3 pairs, but only 2 will count.
         if (numPairs > 2) numPairs = 2;
         return numPairs;

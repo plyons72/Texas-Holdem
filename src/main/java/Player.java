@@ -67,4 +67,9 @@ public class Player
 
     //Gets the num a player has bet this round
     public int getBet() { return playerBet; }
+
+    // if the player do all-in
+    public boolean getAllIn(){
+        return (playerBet==playerMoney);
+    }
 }
