@@ -473,7 +473,7 @@ public class TexasHoldem {
                 LinkedList<Player> finalPlayers = new LinkedList<Player>();
 
                 // Adds all players who are still in the game to a linked list of player objects to easily determine winner
-                for (int i = 0; i <= validCPUs.size(); i++) {
+                for (int i = 0; i < validCPUs.size(); i++) {
                     if (i == validCPUs.size()) {
                         if (player.getIn()) {
                             finalPlayers.add(player);
