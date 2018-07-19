@@ -21,13 +21,24 @@ public class Dealer {
         ftr = cards;
     }
 
-    // Setters
-    public void increaseWinnings(int bet) { potValue += bet; }
-    public void setSharedCards(int[] cards) { ftr = cards; }
+    // Add bet amounts to the pot
+    public void addToPot(int bet) {
+        potValue += bet; }
 
-    // Getters
+    // Set the flop turn and river each round
+    public void setFTR(int[] cards) {
+        ftr = cards; }
+
+    // Gets the amount in the pot
     public int getWinnings() { return potValue; }
+
+    // Gets the cards the dealer has
     public int[] getFTR() { return ftr; }
+
+    // Resets the pot after each game
+    public void refreshPot() {
+        potValue = 0;}
+
 
     /* Rank hands and compare later to determine a winner
     /*****   10 - Royal Flush
@@ -45,15 +56,6 @@ public class Dealer {
     // Takes in an array of player cards
     public void determineRank(Player player) {
 
-        // Check to see if the player rank is -1, indicating that they folded
-        // If they folded, just return
-        if (player.getRank() == -1) {
-            return;
-        }
-
-        // Local variable to hold the rank to set
-        int rank = 10;
-
         // Cards that a user has at their disposal to make winning combo with
         int[] availableCards = new int[7];
 
@@ -63,9 +65,14 @@ public class Dealer {
         availableCards[1] = playerCards[1];
 
         // Create an array of the cards in an individuals pool to check for a win.
-        for (int i = 2; i < 7; i++) {
+        for (int i = 2; i < availableCards.length; i++) {
             availableCards[i] = ftr[i - 2];
         }
+
+        Arrays.sort(availableCards);
+
+        System.out.printf("\n\n%s has the following cards available to use: ", player.getName());
+        System.out.print(Arrays.toString(availableCards));
 
         //******************* Find Card Values *******************//
         // Each index corresponds to a card value. 0 = A, 12 = King
@@ -180,13 +187,15 @@ public class Dealer {
     // Check if we have 3 of a kind in our array
     // @return true if so
     private boolean checkThreeOfKind(int[] cards) {
+        boolean found = false;
+
         for (int i = 0; i < cards.length; i++) {
 
             if(cards[i] == 3){
-                return true;
+                found = true;
             }
         }
-        return false;
+        return found;
     }
 
 
@@ -194,39 +203,43 @@ public class Dealer {
     // @return true if so
     private boolean checkFourOfKind(int[] cards) {
 
+        boolean found = false;
         for (int i = 0; i < cards.length; i++) {
 
             if(cards[i] == 4){
-                return true;
+                found =  true;
             }
         }
-        return false;
+        return found;
     }
 
 
     // Check for 5 cards of the same suit (flush)
     // @return true if there is a flush
     private boolean checkFlush(int[] cards) {
+        boolean found = false;
+
         // Check for flush
         for (int i = 0; i < cards.length; i++)
         {
             if (cards[i] == 5) {
-                return true;
+                found = true;
             }
         }
-        return false;
+        return found;
     }
 
 
     // Check if we have a straight
     // @return true if so
     private boolean checkStraight(int[] cards) {
-        for (int i = 0; i < cards.length - 5; i++)
+        boolean found = false;
+        for (int i = 0; i < (cards.length - 5); i++)
         {
             if (cards[i] > 0 && cards[i + 1] > 0 && cards[i + 2] > 0 && cards[i + 3] > 0 && cards[i + 4] > 0)
-                return true;
+                found = true;
         }
-        return false;
+        return found;
     }
 
 
@@ -234,15 +247,16 @@ public class Dealer {
     // @return true if so
     private boolean checkStraightFlush(int[] cards) {
         Arrays.sort(cards);
+        boolean found = false;
         for (int i = 0; i < 3; i++) {
             if ( (cards[i] == (cards[i + 1] - 1)) &&
                     (cards[i] == (cards[i + 2] - 2)) &&
                     (cards[i] == (cards[i + 3] - 3)) &&
                     (cards[i] == (cards[i + 4] - 4)) ) {
-                return true;
+                found = true;
             }
         }
-        return false;
+        return found;
     }
 
 
