@@ -10,7 +10,7 @@ public class Timer extends Thread {
         while (i > -1) {
             i--;
             try {
-                this.sleep(1000);
+                sleep(1000);
             } catch (InterruptedException e) {
                 System.out.println("User Played");
                 return;

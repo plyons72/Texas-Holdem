@@ -20,9 +20,9 @@ public class TexasHoldem {
     private static final int WINDOW_WIDTH = 950;
     private static final int WINDOW_HEIGHT = 750;
     private static final int DEFAULT_CARD_WIDTH = 90;
-    private static final int DEFAULT_CARD_HEIGHT= 120;
+    private static final int DEFAULT_CARD_HEIGHT = 120;
     private static final int SMALL_CARD_WIDTH = 60;
-    private static final int SMALL_CARD_HEIGHT= 80;
+    private static final int SMALL_CARD_HEIGHT = 80;
     private static String img = "src/img/"; // address of the img folder
     private static String BACKGROUND_COLOR = "#008000"; //
     private static boolean timeEnabled = true;
@@ -68,7 +68,7 @@ public class TexasHoldem {
     private static Dealer dealer;
 
     // Array to hold the indexes of CPU players who are still in the game
-    private static ArrayList<Integer> validCPUs = new ArrayList<Integer>();
+    private static ArrayList < Integer > validCPUs = new ArrayList < Integer > ();
 
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
@@ -87,15 +87,15 @@ public class TexasHoldem {
             validNum = true;
             try {
                 String numPlayerString = JOptionPane.showInputDialog(null, "Welcome to Texas Holdem!\nHow many opponents would you like to face (between 1 and 7 only)");
-                if(numPlayerString == null)
+                if (numPlayerString == null)
                     System.exit(0); // debug: if user click "Cancel", exit program instead of get into error check loop
                 numCPUs = Integer.valueOf(numPlayerString);
-            }catch(NumberFormatException e){
+            } catch (NumberFormatException e) {
                 numCPUs = -1;
             }
             if (numCPUs > 7 || numCPUs < 1) {
                 validNum = false;
-                JOptionPane.showMessageDialog(null,"Error! Number of opponents must be between 1 and 7. Please enter a valid number: ");
+                JOptionPane.showMessageDialog(null, "Error! Number of opponents must be between 1 and 7. Please enter a valid number: ");
             }
 
         } while (!validNum);
@@ -109,21 +109,20 @@ public class TexasHoldem {
 
         JOptionPane.showMessageDialog(null, modeRadioPanel);
 
-        if(!(timerRadio.isSelected())){
+        if (!(timerRadio.isSelected())) {
             timeEnabled = false;
         }
 
-        if(!(heckleRadio.isSelected())){
+        if (!(heckleRadio.isSelected())) {
             heckleEnabled = false;
         }
 
         username = JOptionPane.showInputDialog(null, "What is your name?: ");
-        if(username == null)
+        if (username == null)
             System.exit(0); // debug: if user click "Cancel", exit program
 
         int[] dealerCards = new int[5];
-        for (int i = 0; i < 5; i++)
-        {
+        for (int i = 0; i < 5; i++) {
             dealerCards[i] = deck.dealCard();
         }
 
@@ -132,8 +131,7 @@ public class TexasHoldem {
 
         // Gets cards for player
         int[] playerCards = new int[2];
-        for (int i = 0; i < 2; i++)
-        {
+        for (int i = 0; i < 2; i++) {
             playerCards[i] = deck.dealCard();
         }
 
@@ -148,12 +146,10 @@ public class TexasHoldem {
         String[] cpuNames = getNames(numCPUs);
 
         // Creates objects for each cpu in the cpuPlayer array
-        for (int i = 0; i < numCPUs; i++)
-        {
+        for (int i = 0; i < numCPUs; i++) {
             //Get cards for cpu
             int[] cpuCards = new int[2];
-            for (int j = 0; j < 2; j++)
-            {
+            for (int j = 0; j < 2; j++) {
                 cpuCards[j] = deck.dealCard();
             }
 
@@ -161,7 +157,7 @@ public class TexasHoldem {
             cpuPlayer[i] = new Player(cpuNames[i], 1000, cpuCards, true, 0, 0);
         }
 
-        for(int i = 0; i < numCPUs; i++) {
+        for (int i = 0; i < numCPUs; i++) {
             validCPUs.add(i);
         }
 
@@ -180,40 +176,94 @@ public class TexasHoldem {
 
         // Will hold the indexes of the name array we've selected already so that we can reference
         // names we've already chosen
-        ArrayList<Integer> indexesSelected = new ArrayList<Integer>();
+        ArrayList < Integer > indexesSelected = new ArrayList < Integer > ();
 
         //Array full of a list of names to choose from
-        String nameArray[] = {  "Patrick", "Alex", "Michael", "Gary", "Bill",
-                "Luke", "Anakin", "Leia", "Padme", "Lauren",
-                "Emily", "Rachael", "Donald", "Ivanka", "Barack",
-                "Michelle", "Hannah", "Jennifer", "Rebecca", "Lisa",
-                "Dorian", "Kristo", "Drake", "Thomas", "John",
-                "Rita", "Cody", "Sydney", "Madeline", "Teddy",
-                "Leah", "Gina", "Katie", "Debby", "Allison",
-                "Peyton", "Chad", "Carson", "Brett", "Holly",
-                "Charlotte", "Jenny", "Joey", "Matt", "Dave",
-                "Zach", "Conner", "Jocelyn", "Haley", "Trisha",
-                "Kristina", "Renee", "Megan", "Ray", "Ciara",
-                "Morgan", "Krystyn", "Courtney", "Mara", "Erin",
-                "Shaun", "Kyle", "Jocelyn", "Lafawndah", "Danielle",
-                "Caleb", "Alan", "Jimmy", "Brittney", "Will"
+        String nameArray[] = {
+                "Patrick",
+                "Alex",
+                "Michael",
+                "Gary",
+                "Bill",
+                "Luke",
+                "Anakin",
+                "Leia",
+                "Padme",
+                "Lauren",
+                "Emily",
+                "Rachael",
+                "Donald",
+                "Ivanka",
+                "Barack",
+                "Michelle",
+                "Hannah",
+                "Jennifer",
+                "Rebecca",
+                "Lisa",
+                "Dorian",
+                "Kristo",
+                "Drake",
+                "Thomas",
+                "John",
+                "Rita",
+                "Cody",
+                "Sydney",
+                "Madeline",
+                "Teddy",
+                "Leah",
+                "Gina",
+                "Katie",
+                "Debby",
+                "Allison",
+                "Peyton",
+                "Chad",
+                "Carson",
+                "Brett",
+                "Holly",
+                "Charlotte",
+                "Jenny",
+                "Joey",
+                "Matt",
+                "Dave",
+                "Zach",
+                "Conner",
+                "Jocelyn",
+                "Haley",
+                "Trisha",
+                "Kristina",
+                "Renee",
+                "Megan",
+                "Ray",
+                "Ciara",
+                "Morgan",
+                "Krystyn",
+                "Courtney",
+                "Mara",
+                "Erin",
+                "Shaun",
+                "Kyle",
+                "Jocelyn",
+                "Lafawndah",
+                "Danielle",
+                "Caleb",
+                "Alan",
+                "Jimmy",
+                "Brittney",
+                "Will"
         };
 
         // Fill an array with random integers to use as indices for the name array
         // Check for duplicate values before this
-        for (int i = 0; i < numCPU; i++)
-        {
+        for (int i = 0; i < numCPU; i++) {
             int temp = rand.nextInt(nameArray.length);
-            while (indexesSelected.contains(temp))
-            {
+            while (indexesSelected.contains(temp)) {
                 temp = rand.nextInt(nameArray.length);
             }
             indexesSelected.add(temp);
         }
 
         // Returns the array of cpu names
-        for (int j = 0; j < cpuNames.length; j++)
-        {
+        for (int j = 0; j < cpuNames.length; j++) {
             cpuNames[j] = nameArray[indexesSelected.get(j)];
         }
 
@@ -248,43 +298,42 @@ public class TexasHoldem {
     }
 
 
-    TexasHoldem(Deck deck)  {
+    TexasHoldem(Deck deck) {
         // new variable to store the number of round (starting from 1)
         int hand = 1;
 
         // if there are more than or equal to 6 player, use smaller cards
-        if(validCPUs.size() >= 6){
+        if (validCPUs.size() >= 6) {
             cardWidth = SMALL_CARD_WIDTH;
             cardHeight = SMALL_CARD_HEIGHT;
-        }else{
+        } else {
             cardWidth = DEFAULT_CARD_WIDTH;
             cardHeight = DEFAULT_CARD_HEIGHT;
         }
 
         // setup log
-        try
-        {
+        try {
             Log log = new Log();
             log.printStartGame();
             log.printUserName(player);
             log.printCPUNames(cpuPlayer);
-            log.printCardDealt(player,cpuPlayer);
+            log.printCardDealt(player, cpuPlayer);
             log.printHand(hand);
             textUpdateArea.append(player.getName());
             textUpdateArea.append("!\n");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        catch (IOException e) { e.printStackTrace(); }
 
         // new variable called cpuFoldStatus, boolean[], to store the status of each player
         // initialize player status to be all "in" (i.e. true)
         boolean[] cpuFoldStatus = new boolean[validCPUs.size()];
-        for(int i = 0; i < validCPUs.size(); i++){
+        for (int i = 0; i < validCPUs.size(); i++) {
             cpuFoldStatus[i] = true;
         }
 
         // Gets cards for human player
-        int [] humanPlayerDeck = player.getCards();
+        int[] humanPlayerDeck = player.getCards();
 
         // Get cards for flop, turn, and river
         int[] sharedDeck = dealer.getFTR();
@@ -305,13 +354,13 @@ public class TexasHoldem {
         JButton foldButton = new JButton("Fold");
         setupButton(foldButton);
         JLabel potMoneyLabel = new JLabel();
-        setupPotLabel(potMoneyLabel,dealer);
+        setupPotLabel(potMoneyLabel, dealer);
 
         //calling method to draw all panels
 
         drawTopPanel(topPanel, false);
-        drawMiddlePanel(middlePanel,sharedDeck,false,false,false);
-        drawBottomPanel(bottomPanel, raiseField,raiseButton,callButton,foldButton,potMoneyLabel,timerLabel);
+        drawMiddlePanel(middlePanel, sharedDeck, false, false, false);
+        drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel, timerLabel);
 
         //drawBottomPanel();
         //draw window frame
@@ -339,10 +388,9 @@ public class TexasHoldem {
         boolean endGame = false;
 
         // Linked list holds all player objects, starting with player
-        LinkedList<Player> allPlayers = new LinkedList<Player>();
+        LinkedList < Player > allPlayers = new LinkedList < Player > ();
         allPlayers.add(player);
-        for (int i = 0; i < validCPUs.size(); i++)
-        {
+        for (int i = 0; i < validCPUs.size(); i++) {
             allPlayers.add(cpuPlayer[validCPUs.get(i)]);
         }
 
@@ -357,7 +405,7 @@ public class TexasHoldem {
         Player bigBlind = allPlayers.get(2);
 
         // Run the game
-        while(!endGame) {
+        while (!endGame) {
 
             // Skip over this if we are just in the next betting interval
             if (newGame) {
@@ -388,29 +436,31 @@ public class TexasHoldem {
 
 
             // Cycles through each players turn, starting with the player right after the big blind, and ending with the big blind
-            for(int i = 3; i < allPlayers.size() + 3; i++) {
+            for (int i = 3; i < allPlayers.size() + 3; i++) {
                 Player curPlayer;
 
                 // Lower index to get dealer, small blind, and big blind real bet
                 if (i >= allPlayers.size()) {
                     int j = i - allPlayers.size();
                     curPlayer = allPlayers.get(j);
+                } else {
+                    curPlayer = allPlayers.get(i);
                 }
-                else { curPlayer = allPlayers.get(i); }
 
                 if (curPlayer == player) {
                     // Make sure user didn't fold
                     if (curPlayer.getIn()) {
                         // Update the raise/call field with the amount needed to call
                         raiseField = new JTextField(Integer.toString(amountToCall - curPlayer.getBet()), 6);
-                        drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel,timerLabel);
+                        drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel, timerLabel);
                         windowFrame.repaint();
                         userBet(raiseButton, raiseField, callButton, foldButton, timeEnabled, timerLabel);
                     }
-                }
-                else {
+                } else {
                     // Make sure user didn't fold
-                    if (curPlayer.getIn()) { cpuBet(curPlayer); }
+                    if (curPlayer.getIn()) {
+                        cpuBet(curPlayer);
+                    }
                 }
 
 
@@ -421,8 +471,7 @@ public class TexasHoldem {
 
             System.out.println("\n\n\n\n\nFinished initial bets. Going through to allow everyone to call\n\n\n\n\n");
 
-            for (int i = 0; i < allPlayers.size(); i++)
-            {
+            for (int i = 0; i < allPlayers.size(); i++) {
                 // Check if player is in
                 if (allPlayers.get(i).getIn()) {
 
@@ -432,16 +481,13 @@ public class TexasHoldem {
                     if (curPlayer.getBet() < amountToCall) {
 
                         // Seperate out player from cpu
-                        if (curPlayer == player)
-                        {
+                        if (curPlayer == player) {
                             // Update the raise/call field with the amount needed to call
                             raiseField = new JTextField(Integer.toString(amountToCall - curPlayer.getBet()), 6);
                             drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel, timerLabel);
                             windowFrame.repaint();
                             userBet(raiseButton, raiseField, callButton, foldButton, timeEnabled, timerLabel);
-                        }
-
-                        else {
+                        } else {
                             cpuBet(curPlayer);
                         }
                     }
@@ -459,17 +505,17 @@ public class TexasHoldem {
             if (!flopSet) {
                 System.out.println("********************SETTING FLOP********************");
                 textUpdateArea.append("\nThe dealer reveals the flop.\n");
-                revealFlop(middlePanel,sharedDeck);
+                revealFlop(middlePanel, sharedDeck);
                 windowFrame.repaint();
                 flopSet = true;
                 newGame = false;
             }
 
             // Check if we revealed turn, if not, reveal, and set var to true
-            else if(!turnSet){
+            else if (!turnSet) {
                 System.out.println("********************SETTING TURN********************");
                 textUpdateArea.append("\nThe dealer reveals the turn.\n");
-                revealTurn(middlePanel,sharedDeck);
+                revealTurn(middlePanel, sharedDeck);
                 windowFrame.repaint();
                 turnSet = true;
                 newGame = false;
@@ -481,8 +527,7 @@ public class TexasHoldem {
                 textUpdateArea.append("\nThe dealer reveals the river.\n");
                 revealRiver(middlePanel, sharedDeck);
 
-                for (int i = 0; i < validCPUs.size(); i++)
-                {
+                for (int i = 0; i < validCPUs.size(); i++) {
                     cpuFoldStatus[i] = cpuPlayer[validCPUs.get(i)].getIn();
                 }
 
@@ -491,7 +536,7 @@ public class TexasHoldem {
                 windowFrame.repaint();
 
                 // Holds all player objects who are called in for the final check
-                LinkedList<Player> finalPlayers = new LinkedList<Player>();
+                LinkedList < Player > finalPlayers = new LinkedList < Player > ();
 
                 // Adds all players who are still in the game to a linked list of player objects to easily determine winner
                 for (int i = 0; i < validCPUs.size(); i++) {
@@ -512,7 +557,7 @@ public class TexasHoldem {
 
                 int winnerRank = 0;
                 int winnerHigh = 0;
-                ArrayList<Integer> winnerIndex = new ArrayList<Integer>();
+                ArrayList < Integer > winnerIndex = new ArrayList < Integer > ();
                 winnerIndex.add(0);
 
                 // Cycles through and determines the winner
@@ -536,21 +581,22 @@ public class TexasHoldem {
                         winnerIndex.clear();
                         winnerIndex.add(i);
                         winnerRank = tempRank;
-                        winnerHigh= tempHigh;
+                        winnerHigh = tempHigh;
                     }
 
                     // If there is a tie, add to winner rank. check for real tie later
                     if (tempRank == winnerRank) {
                         // This user has a higher high card
-                        if (tempHigh > winnerHigh)
-                        {
+                        if (tempHigh > winnerHigh) {
                             winnerIndex.clear();
                             winnerIndex.add(i);
                             winnerHigh = tempHigh;
                         }
 
                         // High cards match, true tie
-                        else if (tempHigh == winnerHigh) { winnerIndex.add(i); }
+                        else if (tempHigh == winnerHigh) {
+                            winnerIndex.add(i);
+                        }
 
                         // No tie, just continue
                         else {}
@@ -624,8 +670,7 @@ public class TexasHoldem {
 
                 Player[] updatedCPU = new Player[validCPUs.size()];
 
-                for (int i = 0; i < validCPUs.size(); i ++)
-                {
+                for (int i = 0; i < validCPUs.size(); i++) {
                     updatedCPU[i] = cpuPlayer[validCPUs.get(i)];
                 }
 
@@ -660,7 +705,7 @@ public class TexasHoldem {
 
         // Start up the heckling if user has enabled it
         Heckle heckle = new Heckle();
-        if(heckleEnabled){
+        if (heckleEnabled) {
             heckle.start();
         }
 
@@ -672,7 +717,7 @@ public class TexasHoldem {
         int callDifference = amountToCall - player.getBet();
 
         // This should check if the player is in too
-        if(timeEnabled){
+        if (timeEnabled) {
             timer.start();
         }
         // Only allow raising if it has been less than 3 times
@@ -710,24 +755,21 @@ public class TexasHoldem {
                 playerBetStatus = true;
             }
         });
-        while (!playerBetStatus && timer.getI()> 0) {
-            if (timeEnabled){
+        while (!playerBetStatus && timer.getI() > 0) {
+            if (timeEnabled) {
                 timerLabel.setText(Integer.toString(timer.getI()));
             }
-            if (heckleEnabled){
-                if(!(heckle.getInsult().equals(oldInsult))){
+            if (heckleEnabled) {
+                if (!(heckle.getInsult().equals(oldInsult))) {
                     textUpdateArea.append(heckle.getInsult());
                     oldInsult = heckle.getInsult();
                 }
             }
         }
         timerLabel.setText("");
-        if(playerBetStatus)
-        {
+        if (playerBetStatus) {
             timer.interrupt();
-        }
-        else
-        {
+        } else {
             playerFunction = 3;
         }
 
@@ -736,8 +778,8 @@ public class TexasHoldem {
         // User raised. Remove that raise and the call amounts from their pot, and add to main pot
         switch (playerFunction) {
             case 1:
-                 heckle.interrupt(); //don't worry about heckling until next time we call userBet
-                 oldInsult = "starter insult";
+                heckle.interrupt(); //don't worry about heckling until next time we call userBet
+                oldInsult = "starter insult";
 
                 // User bets the called amount plus their bet
                 player.removeBetAmount(playerBet + amountToCall);
@@ -750,7 +792,7 @@ public class TexasHoldem {
                 // Increase the pot
                 dealer.addToPot(amountToCall);
 
-                System.out.println(player.getName() + " raised the call value by " + playerBet + " to "  + amountToCall);
+                System.out.println(player.getName() + " raised the call value by " + playerBet + " to " + amountToCall);
                 textUpdateArea.append(player.getName() + " raises by $" + playerBet + " to " + amountToCall + ".\n");
 
                 // Increment raises
@@ -761,7 +803,7 @@ public class TexasHoldem {
 
             case 2:
                 heckle.interrupt();
-		        oldInsult = "starter insult";
+                oldInsult = "starter insult";
 
                 // Remove the call amount from the player's pool
                 if (playerTotal >= callDifference) {
@@ -785,7 +827,7 @@ public class TexasHoldem {
 
             case 3:
                 heckle.interrupt(); //don't worry about heckling until next time we call userBet
-		        oldInsult = "starter insult";
+                oldInsult = "starter insult";
                 player.setIn(false);
                 System.out.println(player.getName() + " folds.\n");
                 textUpdateArea.append(player.getName() + " folds.\n");
@@ -806,8 +848,7 @@ public class TexasHoldem {
         // Sleep for 3 seconds to slow gameplay down
         try {
             TimeUnit.SECONDS.sleep(3);
-        }
-        catch(InterruptedException e ) {}
+        } catch (InterruptedException e) {}
 
 
         Random rand = new Random();
@@ -835,10 +876,12 @@ public class TexasHoldem {
         // If the cpu has more cash than the amount needed to call, allows the cpu to raise
         // CPU can raise the pot by a total of half of their max earnings
         // Else, if the cpu is set to raise, changes that to a different function, randomly
-        if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 4); }
-
-        else {
-            if (cpuFunction == 1) { cpuFunction = rand.nextInt(1) + 2; }
+        if (cpuTotal > amountToCall) {
+            betRange = ((cpuTotal - amountToCall) / 4);
+        } else {
+            if (cpuFunction == 1) {
+                cpuFunction = rand.nextInt(1) + 2;
+            }
         }
 
 
@@ -928,8 +971,8 @@ public class TexasHoldem {
         playerPanel.setBackground(Color.decode(BACKGROUND_COLOR));
         playerPanel.setLayout(new BorderLayout());
         playerPanel.add(new JLabel(player.getName()), BorderLayout.NORTH); // Name
-        playerPanel.add(getResizableCardLabel(playerCards[0], DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT),BorderLayout.WEST);
-        playerPanel.add(getResizableCardLabel(playerCards[1], DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT),BorderLayout.EAST);
+        playerPanel.add(getResizableCardLabel(playerCards[0], DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT), BorderLayout.WEST);
+        playerPanel.add(getResizableCardLabel(playerCards[1], DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT), BorderLayout.EAST);
 
         // Buttons
         JPanel buttonsPanel = new JPanel();
@@ -948,8 +991,8 @@ public class TexasHoldem {
 
         // Put things together
         GridBagConstraints c = new GridBagConstraints();
-        bottomPanel.add(playerPanel,c);
-        bottomPanel.add(buttonsPanel,c);
+        bottomPanel.add(playerPanel, c);
+        bottomPanel.add(buttonsPanel, c);
     }
 
     /**
@@ -962,7 +1005,7 @@ public class TexasHoldem {
      */
     private void drawMiddlePanel(JPanel middlePanel, int[] sharedDeck, boolean showFlop, boolean showTurn, boolean showRiver) {
         middlePanel.removeAll();
-        middlePanel.setPreferredSize(new Dimension(WINDOW_WIDTH,250));
+        middlePanel.setPreferredSize(new Dimension(WINDOW_WIDTH, 250));
         middlePanel.setBackground(Color.decode(BACKGROUND_COLOR));
         middlePanel.setLayout(new GridBagLayout());
 
@@ -972,19 +1015,19 @@ public class TexasHoldem {
         JScrollPane scrollPane = new JScrollPane(textUpdatePanel);
 
         scrollPane.setMinimumSize(new Dimension(280, 120));
-		scrollPane.setMaximumSize(new Dimension(280, 120));
-		scrollPane.setPreferredSize(new Dimension(280, 120));
+        scrollPane.setMaximumSize(new Dimension(280, 120));
+        scrollPane.setPreferredSize(new Dimension(280, 120));
 
-		sharedDeckPanel.setBackground(Color.decode(BACKGROUND_COLOR));
+        sharedDeckPanel.setBackground(Color.decode(BACKGROUND_COLOR));
 
-		textUpdatePanel.setBackground(Color.white);
-		textUpdateArea.setEditable(false);
-		textUpdateArea.setBackground(null);
+        textUpdatePanel.setBackground(Color.white);
+        textUpdateArea.setEditable(false);
+        textUpdateArea.setBackground(null);
 
-		// Text
-       		textUpdatePanel.add(textUpdateArea);
+        // Text
+        textUpdatePanel.add(textUpdateArea);
 
-       		// Flop
+        // Flop
         for (int i = 0; i < 3; i++) {
             if (showFlop) {
                 sharedDeckPanel.add(getResizableCardLabel(sharedDeck[i], DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT));
@@ -1018,8 +1061,7 @@ public class TexasHoldem {
 
         boolean[] allPlayerStatus = new boolean[cpuPlayer.length];
 
-        for(int i = 0; i < cpuPlayer.length; i++)
-        {
+        for (int i = 0; i < cpuPlayer.length; i++) {
             allPlayerStatus[i] = cpuPlayer[i].getIn();
         }
 
@@ -1046,11 +1088,10 @@ public class TexasHoldem {
                     playerPanels[i].add(getResizableCardBackLabel(cardWidth, cardHeight), BorderLayout.WEST);
                     playerPanels[i].add(getResizableCardBackLabel(cardWidth, cardHeight), BorderLayout.EAST);
                 }
-            }
-            else {
+            } else {
                 JLabel outLabel = new JLabel("OUT");
-                outLabel.setFont(new Font("Arial",Font.BOLD,16));
-                playerPanels[i].add(outLabel,BorderLayout.SOUTH);
+                outLabel.setFont(new Font("Arial", Font.BOLD, 16));
+                playerPanels[i].add(outLabel, BorderLayout.SOUTH);
             }
 
             topPanel.add(playerPanels[i], new GridBagConstraints());
@@ -1069,38 +1110,38 @@ public class TexasHoldem {
 
     // make card label of int Card
     private JLabel getResizableCardLabel(int card, int width, int height) {
-        return getResizableImageLabel(img+card+".png",width,height);
+        return getResizableImageLabel(img + card + ".png", width, height);
     }
 
     // make card back label
     private JLabel getResizableCardBackLabel(int width, int height) {
-        return getResizableImageLabel(img+"backOfCard.png",width,height);
+        return getResizableImageLabel(img + "backOfCard.png", width, height);
     }
 
-    // simplifying code
-    private void setupButton(JButton button){
+    // Simplifying code
+    private void setupButton(JButton button) {
         button.setVisible(true);
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setVerticalAlignment(SwingConstants.CENTER);
     }
 
     // Redraw the middle panel showing Flop
-    private void revealFlop(JPanel middlePanel, int[] sharedDeck){
-        drawMiddlePanel(middlePanel,sharedDeck,true,false,false);
+    private void revealFlop(JPanel middlePanel, int[] sharedDeck) {
+        drawMiddlePanel(middlePanel, sharedDeck, true, false, false);
     }
 
     // Redraw the middle panel showing Flop and Turn
-    private void revealTurn(JPanel middlePanel, int[] sharedDeck){
-        drawMiddlePanel(middlePanel,sharedDeck,true,true,false);
+    private void revealTurn(JPanel middlePanel, int[] sharedDeck) {
+        drawMiddlePanel(middlePanel, sharedDeck, true, true, false);
     }
 
     // Redraw the middle panel and show the river
-    private void revealRiver(JPanel middlePanel, int[] sharedDeck){
-        drawMiddlePanel(middlePanel,sharedDeck,true,true,true);
+    private void revealRiver(JPanel middlePanel, int[] sharedDeck) {
+        drawMiddlePanel(middlePanel, sharedDeck, true, true, true);
     }
 
-    // setup pot label
-    private void setupPotLabel(JLabel potLabel, Dealer dealer){
+    // Setup pot label
+    private void setupPotLabel(JLabel potLabel, Dealer dealer) {
         potLabel.setText("POT: $" + dealer.getWinnings());
         potLabel.setVerticalAlignment(SwingConstants.CENTER);
         potLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -1108,8 +1149,8 @@ public class TexasHoldem {
         potLabel.setForeground(Color.BLUE);
     }
 
-    // setup money field
-    private void setupMoneyField(JTextField raiseField){
+    // Setup money field
+    private void setupMoneyField(JTextField raiseField) {
         raiseField.setVisible(true);
         raiseField.setBackground(Color.BLUE);
         raiseField.setForeground(Color.WHITE);
@@ -1123,31 +1164,31 @@ public class TexasHoldem {
                 hand = "Royal Flush";
                 break;
             case 9:
-                hand ="Straight Flush";
+                hand = "Straight Flush";
                 break;
             case 8:
-                hand ="Four of a Kind";
+                hand = "Four of a Kind";
                 break;
             case 7:
-                hand ="Full House";
+                hand = "Full House";
                 break;
             case 6:
-                hand ="Flush";
+                hand = "Flush";
                 break;
             case 5:
-                hand ="Straight";
+                hand = "Straight";
                 break;
             case 4:
-                hand ="Three of a Kind";
+                hand = "Three of a Kind";
                 break;
             case 3:
-                hand ="Two Pair";
+                hand = "Two Pair";
                 break;
             case 2:
-                hand ="One Pair";
+                hand = "One Pair";
                 break;
             default:
-                hand ="High Card";
+                hand = "High Card";
                 break;
         }
         return hand;

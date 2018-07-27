@@ -30,8 +30,9 @@ public class Log {
         bw.write("AI Players: ");
         for (int i = 0; i < cpuPlayers.length; i++) {
             bw.write(cpuPlayers[i].getName());
-            if(i < cpuPlayers.length - 1) {
-                bw.write(", "); }
+            if (i < cpuPlayers.length - 1) {
+                bw.write(", ");
+            }
         }
         bw.write("\n");
         bw.close();
@@ -89,29 +90,29 @@ public class Log {
         setupWriters();
         bw.write("Flop: ");
         for (int i = 0; i < 3; i++) {
-            bw.write(getCardName(shareDeck[i])+" ");
+            bw.write(getCardName(shareDeck[i]) + " ");
         }
         bw.write("\n");
         bw.close();
     }
 
-    public void printTurn(int [] shareDeck) throws IOException{
+    public void printTurn(int[] shareDeck) throws IOException {
         setupWriters();
         bw.write("Turn: ");
-        bw.write(getCardName(shareDeck[3])+" \n");
+        bw.write(getCardName(shareDeck[3]) + " \n");
         bw.close();
     }
 
-    public void printRiver(int [] shareDeck) throws IOException{
+    public void printRiver(int[] shareDeck) throws IOException {
         setupWriters();
         bw.write("River: ");
-        bw.write(getCardName(shareDeck[4])+" \n");
+        bw.write(getCardName(shareDeck[4]) + " \n");
         bw.close();
     }
 
-    public void printWinMoney(Player player, int pot) throws IOException{
+    public void printWinMoney(Player player, int pot) throws IOException {
         setupWriters();
-        bw.write(player.getName()+" wins $"+pot);
+        bw.write(player.getName() + " wins $" + pot);
         bw.close();
     }
 
@@ -157,26 +158,26 @@ public class Log {
 
     public void updatePlayerStatus(String playerName, boolean win, int moneyWon) throws IOException {
         new File("game_log").mkdir();
-        File playerStatusFile = new File("game_log/log_"+playerName+".txt");
+        File playerStatusFile = new File("game_log/log_" + playerName + ".txt");
         FileWriter PSFW = new FileWriter(playerStatusFile);
         BufferedWriter PSBW = new BufferedWriter(PSFW);
         Scanner S = new Scanner(playerStatusFile);
         String name = playerName;
         int round = 1;
-        int numWins = 0 ;
+        int numWins = 0;
         int totalMoneyWon = 0;
-        if(S.hasNext()){ // not a new/empty file
+        if (S.hasNext()) { // not a new/empty file
             name = S.nextLine();
             round = Integer.valueOf(S.nextLine());
             numWins = Integer.valueOf(S.nextLine());
             totalMoneyWon = Integer.valueOf(S.nextLine());
         }
         PSBW.write(name);
-        PSBW.write(round+1);
-        if(win){
-            PSBW.write(numWins+1);
-            PSBW.write(totalMoneyWon+moneyWon);
-        }else{
+        PSBW.write(round + 1);
+        if (win) {
+            PSBW.write(numWins + 1);
+            PSBW.write(totalMoneyWon + moneyWon);
+        } else {
             PSBW.write(numWins);
             PSBW.write(totalMoneyWon);
         }

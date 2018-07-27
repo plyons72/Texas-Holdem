@@ -23,35 +23,42 @@ public class Dealer {
 
     // Add bet amounts to the pot
     public void addToPot(int bet) {
-        potValue += bet; }
+        potValue += bet;
+    }
 
     // Set the flop turn and river each round
     public void setFTR(int[] cards) {
-        ftr = cards; }
+        ftr = cards;
+    }
 
     // Gets the amount in the pot
-    public int getWinnings() { return potValue; }
+    public int getWinnings() {
+        return potValue;
+    }
 
     // Gets the cards the dealer has
-    public int[] getFTR() { return ftr; }
+    public int[] getFTR() {
+        return ftr;
+    }
 
     // Resets the pot after each game
     public void refreshPot() {
-        potValue = 0;}
+        potValue = 0;
+    }
 
 
-    /* Rank hands and compare later to determine a winner
-    /*****   10 - Royal Flush
-    /*****   9 - Straight Flush
-    /*****   8 - Four of a kind
-    /*****   7 - Full House
-    /*****   6 - Flush
-    /*****   5 - Straight
-    /*****   4 - Three of a Kind
-    /*****   3 - Two Pair
-    /*****   2 - One Pair
-    /*****   1 - High Card
-    */
+ /* Rank hands and compare later to determine a winner
+ /*****   10 - Royal Flush
+ /*****   9 - Straight Flush
+ /*****   8 - Four of a kind
+ /*****   7 - Full House
+ /*****   6 - Flush
+ /*****   5 - Straight
+ /*****   4 - Three of a Kind
+ /*****   3 - Two Pair
+ /*****   2 - One Pair
+ /*****   1 - High Card
+ */
 
     // Takes in an array of player cards
     public void determineRank(Player player) {
@@ -76,7 +83,21 @@ public class Dealer {
 
         //******************* Find Card Values *******************//
         // Each index corresponds to a card value. 0 = A, 12 = King
-        int[] valueArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        int[] valueArray = {
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+        };
 
         // Finds the value of the cards in a user's pool between 0 and 12
         // Increments index corresponding to that value if found in availableCards[]
@@ -88,7 +109,12 @@ public class Dealer {
 
         //******************* Find Card Suits *******************//
         // Used to reference # of cards per suit, to check for Flush
-        int[] suitArray = {0, 0, 0, 0};
+        int[] suitArray = {
+                0,
+                0,
+                0,
+                0
+        };
 
         // Build array to check for flush;
         for (int i = 0; i < suitArray.length; i++) {
@@ -123,41 +149,23 @@ public class Dealer {
         // Appropriately set the rank
         if (royalFlush) {
             player.setRank(10);
-        }
-
-        else if (straightFlush) {
+        } else if (straightFlush) {
             player.setRank(9);
-        }
-
-        else if (fourOfKind) {
+        } else if (fourOfKind) {
             player.setRank(8);
-        }
-
-        else if (fullHouse) {
+        } else if (fullHouse) {
             player.setRank(7);
-        }
-
-        else if (flush) {
+        } else if (flush) {
             player.setRank(6);
-        }
-
-        else if (straight) {
+        } else if (straight) {
             player.setRank(5);
-        }
-
-        else if (threeOfKind) {
+        } else if (threeOfKind) {
             player.setRank(4);
-        }
-
-        else if (numPairs == 2) {
+        } else if (numPairs == 2) {
             player.setRank(3);
-        }
-
-        else if (numPairs == 1) {
+        } else if (numPairs == 1) {
             player.setRank(2);
-        }
-
-        else{
+        } else {
             player.setRank(1);
         }
 
@@ -173,11 +181,11 @@ public class Dealer {
         // If we find a pair, increment the number of pairs we've found
         for (int i = 0; i < cards.length; i++) {
 
-            if(cards[i] == 2){
+            if (cards[i] == 2) {
                 numPairs++;
             }
         }
-        
+
         // Texas Holdem is played with a "Best 5 card hand" schema in mind. We can have 3 pairs, but only 2 will count.
         if (numPairs > 2) numPairs = 2;
         return numPairs;
@@ -191,7 +199,7 @@ public class Dealer {
 
         for (int i = 0; i < cards.length; i++) {
 
-            if(cards[i] == 3){
+            if (cards[i] == 3) {
                 found = true;
             }
         }
@@ -206,8 +214,8 @@ public class Dealer {
         boolean found = false;
         for (int i = 0; i < cards.length; i++) {
 
-            if(cards[i] == 4){
-                found =  true;
+            if (cards[i] == 4) {
+                found = true;
             }
         }
         return found;
@@ -220,8 +228,7 @@ public class Dealer {
         boolean found = false;
 
         // Check for flush
-        for (int i = 0; i < cards.length; i++)
-        {
+        for (int i = 0; i < cards.length; i++) {
             if (cards[i] == 5) {
                 found = true;
             }
@@ -234,8 +241,7 @@ public class Dealer {
     // @return true if so
     private boolean checkStraight(int[] cards) {
         boolean found = false;
-        for (int i = 0; i < (cards.length - 5); i++)
-        {
+        for (int i = 0; i < (cards.length - 5); i++) {
             if (cards[i] > 0 && cards[i + 1] > 0 && cards[i + 2] > 0 && cards[i + 3] > 0 && cards[i + 4] > 0)
                 found = true;
         }
@@ -249,10 +255,10 @@ public class Dealer {
         Arrays.sort(cards);
         boolean found = false;
         for (int i = 0; i < 3; i++) {
-            if ( (cards[i] == (cards[i + 1] - 1)) &&
+            if ((cards[i] == (cards[i + 1] - 1)) &&
                     (cards[i] == (cards[i + 2] - 2)) &&
                     (cards[i] == (cards[i + 3] - 3)) &&
-                    (cards[i] == (cards[i + 4] - 4)) ) {
+                    (cards[i] == (cards[i + 4] - 4))) {
                 found = true;
             }
         }
@@ -269,13 +275,13 @@ public class Dealer {
 
         // Checks for royal flush in all cases with all 7 cards
         for (int i = 0; i < 3; i++) {
-            if(cards[i] == 9 && cards[i + 1] == 10 && cards[i + 2] == 11 && cards[i + 3] == 12 && cards[i+4] == 13)
+            if (cards[i] == 9 && cards[i + 1] == 10 && cards[i + 2] == 11 && cards[i + 3] == 12 && cards[i + 4] == 13)
                 return true;
-            else if(cards[i] == 22 && cards[i + 1] == 23 && cards[i + 2] == 24 && cards[i + 3] == 25 && cards[i+4] == 26)
+            else if (cards[i] == 22 && cards[i + 1] == 23 && cards[i + 2] == 24 && cards[i + 3] == 25 && cards[i + 4] == 26)
                 return true;
-            else if(cards[i] == 35 && cards[i + 1] == 36 && cards[i + 2] == 37 && cards[i + 3] == 38 && cards[i+4] == 39)
+            else if (cards[i] == 35 && cards[i + 1] == 36 && cards[i + 2] == 37 && cards[i + 3] == 38 && cards[i + 4] == 39)
                 return true;
-            else if(cards[i] == 48 && cards[i + 1] == 49 && cards[i + 2] == 50 && cards[i + 3] == 51 && cards[i+4] == 52)
+            else if (cards[i] == 48 && cards[i + 1] == 49 && cards[i + 2] == 50 && cards[i + 3] == 51 && cards[i + 4] == 52)
                 return true;
         }
 
