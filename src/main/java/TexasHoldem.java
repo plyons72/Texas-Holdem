@@ -716,10 +716,9 @@ public class TexasHoldem {
 
         int callDifference = amountToCall - player.getBet();
 
-        // This should check if the player is in too
-        if (timeEnabled) {
-            timer.start();
-        }
+        //this should check if the play is in too
+        timer.start();
+
         // Only allow raising if it has been less than 3 times
         if (numRaises <= 3) {
 
@@ -727,6 +726,7 @@ public class TexasHoldem {
             raiseButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
+                    System.out.println("Did we get here 1?");
                     String playerBetString = amountOfMoney.getText();
                     //TODO: check for only ints
                     //TODO: allow player to re-bet if they put in an amount too high (or negative)
@@ -742,6 +742,7 @@ public class TexasHoldem {
         callButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
+                //System.out.println("Did we get here 1?");
                 playerFunction = 2;
                 playerBetStatus = true;
             }
@@ -751,23 +752,52 @@ public class TexasHoldem {
         foldButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
+                //System.out.println("Did we get here 2?");
                 playerFunction = 3;
                 playerBetStatus = true;
             }
         });
-        while (!playerBetStatus && timer.getI() > 0) {
-            if (timeEnabled) {
-                timerLabel.setText(Integer.toString(timer.getI()));
-            }
-            if (heckleEnabled) {
-                if (!(heckle.getInsult().equals(oldInsult))) {
-                    textUpdateArea.append(heckle.getInsult());
-                    oldInsult = heckle.getInsult();
+        if (timeEnabled) {
+            //System.out.println("TimeEnabled");
+            while (!playerBetStatus && timer.getI() > 0) {
+                if (timeEnabled) {
+                    timerLabel.setText(Integer.toString(timer.getI()));
+                }
+                if (heckleEnabled) {
+                    if (!(heckle.getInsult().equals(oldInsult))) {
+                        textUpdateArea.append(heckle.getInsult());
+                        oldInsult = heckle.getInsult();
+                    }
                 }
             }
         }
+        else
+        {
+            System.out.println("No Time");
+            while (!playerBetStatus) {
+                if (timeEnabled) {
+                    //System.out.println("No Time Shouldn't be here");
+                    timerLabel.setText(Integer.toString(timer.getI()));
+                }
+                if (heckleEnabled) {
+                   // System.out.println("Is Heckle the Problem");
+                    if (!(heckle.getInsult().equals(oldInsult))) {
+                        textUpdateArea.append(heckle.getInsult());
+                        oldInsult = heckle.getInsult();
+                    }
+                }
+                try {
+                    TimeUnit.SECONDS.sleep(3);
+                }
+                catch(InterruptedException e )
+                {}
+               //System.out.println("I'm going to regret this");
+            }
+        }
         timerLabel.setText("");
-        if (playerBetStatus) {
+        if(playerBetStatus)
+        {
+            //System.out.println("did we interrupt");
             timer.interrupt();
         } else {
             playerFunction = 3;
