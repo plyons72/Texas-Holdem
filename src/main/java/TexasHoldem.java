@@ -165,7 +165,7 @@ public class TexasHoldem {
             validCPUs.add(i);
         }
 
-        TexasHoldem texasHoldem = new TexasHoldem(player, cpuPlayer, dealer, deck);
+        TexasHoldem texasHoldem = new TexasHoldem(deck);
 
     }
 
@@ -248,7 +248,7 @@ public class TexasHoldem {
     }
 
 
-    TexasHoldem(Player player, Player[] cpuPlayer, Dealer dealer, Deck deck)  {
+    TexasHoldem(Deck deck)  {
         // new variable to store the number of round (starting from 1)
         int hand = 1;
 
@@ -553,9 +553,7 @@ public class TexasHoldem {
                         else if (tempHigh == winnerHigh) { winnerIndex.add(i); }
 
                         // No tie, just continue
-                        else {
-
-                        }
+                        else {}
 
                     }
 
@@ -651,9 +649,10 @@ public class TexasHoldem {
 
     }
 
-    //runs until a bet has been made and then returns the amount the player bets (or -1 to fold)
-    //has to take in the player, the buttons, and the text field
-    public static void userBet(JButton raiseButton, JTextField amountOfMoney, JButton callButton, JButton foldButton, boolean timeEnabled, JLabel timerLabel) {
+    // Runs until a bet has been made and then returns the amount the player bets (or -1 to fold)
+    //has to take in the buttons, and the text field
+    public static void userBet(JButton raiseButton, JTextField amountOfMoney, JButton callButton, JButton foldButton,
+                               boolean timeEnabled, JLabel timerLabel) {
 
         // Get players current pot for reference
         int playerTotal = player.getMoney();
@@ -666,12 +665,13 @@ public class TexasHoldem {
         }
 
         System.out.println("\n\nIt's " + player.getName() + "'s turn!");
+        textUpdateArea.append("It's your turn!");
         System.out.println("Amount to call is " + amountToCall);
         System.out.println("numraises is " + numRaises);
 
         int callDifference = amountToCall - player.getBet();
 
-        //this should check if the play is in too
+        // This should check if the player is in too
         if(timeEnabled){
             timer.start();
         }
@@ -737,7 +737,7 @@ public class TexasHoldem {
         switch (playerFunction) {
             case 1:
                  heckle.interrupt(); //don't worry about heckling until next time we call userBet
-		 oldInsult = "starter insult";
+                 oldInsult = "starter insult";
 
                 // User bets the called amount plus their bet
                 player.removeBetAmount(playerBet + amountToCall);
@@ -760,8 +760,9 @@ public class TexasHoldem {
                 break;
 
             case 2:
-                heckle.interrupt(); //don't worry about heckling until next time we call userBet
-		oldInsult = "starter insult";
+                heckle.interrupt();
+		        oldInsult = "starter insult";
+
                 // Remove the call amount from the player's pool
                 if (playerTotal >= callDifference) {
                     player.removeBetAmount(callDifference);
@@ -784,7 +785,7 @@ public class TexasHoldem {
 
             case 3:
                 heckle.interrupt(); //don't worry about heckling until next time we call userBet
-		oldInsult = "starter insult";
+		        oldInsult = "starter insult";
                 player.setIn(false);
                 System.out.println(player.getName() + " folds.\n");
                 textUpdateArea.append(player.getName() + " folds.\n");
@@ -806,8 +807,7 @@ public class TexasHoldem {
         try {
             TimeUnit.SECONDS.sleep(3);
         }
-        catch(InterruptedException e )
-        {}
+        catch(InterruptedException e ) {}
 
 
         Random rand = new Random();
@@ -818,6 +818,7 @@ public class TexasHoldem {
 
 
         System.out.println("\n\nIt's " + cpuPlayer.getName() + "'s turn!");
+        textUpdateArea.append("It's " + cpuPlayer.getName() + "'s turn!");
         System.out.println("Amount to call is " + amountToCall);
         System.out.println("numraises is " + numRaises);
 
@@ -847,7 +848,7 @@ public class TexasHoldem {
                 //
                 int betNum = rand.nextInt(betRange) + 1;
 
-                //set that bet to the new required bet
+                // Set that bet to the new required bet
                 amountToCall += betNum;
 
                 // Remove money equal to the call amount and the raised amount
@@ -873,6 +874,7 @@ public class TexasHoldem {
                     textUpdateArea.append(cpuPlayer.getName() + " called on $" + amountToCall + ".\n");
                     dealer.addToPot(amountToCall);
                 }
+
                 // CPU is going all in, but can't actually match the amount called
                 // need to lower the bet per player
                 else {
@@ -884,7 +886,6 @@ public class TexasHoldem {
                 }
 
                 numUsersCalled++;
-
                 break;
 
 
@@ -899,7 +900,6 @@ public class TexasHoldem {
                 numUsersFolded++;
                 break;
         }
-
 
         System.out.println(cpuPlayer.getName() + " has " + cpuPlayer.getMoney());
         System.out.println("numRaises: " + numRaises);
@@ -965,19 +965,26 @@ public class TexasHoldem {
         middlePanel.setPreferredSize(new Dimension(WINDOW_WIDTH,250));
         middlePanel.setBackground(Color.decode(BACKGROUND_COLOR));
         middlePanel.setLayout(new GridBagLayout());
+
         JPanel sharedDeckPanel = new JPanel();
         JPanel textUpdatePanel = new JPanel();
+
         JScrollPane scrollPane = new JScrollPane(textUpdatePanel);
+
         scrollPane.setMinimumSize(new Dimension(280, 120));
 		scrollPane.setMaximumSize(new Dimension(280, 120));
 		scrollPane.setPreferredSize(new Dimension(280, 120));
-        sharedDeckPanel.setBackground(Color.decode(BACKGROUND_COLOR));
-       	textUpdatePanel.setBackground(Color.white);
+
+		sharedDeckPanel.setBackground(Color.decode(BACKGROUND_COLOR));
+
+		textUpdatePanel.setBackground(Color.white);
 		textUpdateArea.setEditable(false);
 		textUpdateArea.setBackground(null);
-       	// Text
+
+		// Text
        		textUpdatePanel.add(textUpdateArea);
-        // Flop
+
+       		// Flop
         for (int i = 0; i < 3; i++) {
             if (showFlop) {
                 sharedDeckPanel.add(getResizableCardLabel(sharedDeck[i], DEFAULT_CARD_WIDTH, DEFAULT_CARD_HEIGHT));
@@ -1020,8 +1027,11 @@ public class TexasHoldem {
         topPanel.setPreferredSize(new Dimension(WINDOW_WIDTH, 250));
         topPanel.setBackground(Color.decode(BACKGROUND_COLOR));
         topPanel.setLayout(new GridBagLayout());
+
         int numPlayers = cpuPlayer.length;
+
         JPanel[] playerPanels = new JPanel[numPlayers];
+
         for (int i = 0; i < numPlayers; i++) {
             playerPanels[i] = new JPanel(new BorderLayout());
             JLabel nameLabel = new JLabel(cpuPlayer[i].getName());
@@ -1037,12 +1047,12 @@ public class TexasHoldem {
                     playerPanels[i].add(getResizableCardBackLabel(cardWidth, cardHeight), BorderLayout.EAST);
                 }
             }
-            else{
+            else {
                 JLabel outLabel = new JLabel("OUT");
                 outLabel.setFont(new Font("Arial",Font.BOLD,16));
                 playerPanels[i].add(outLabel,BorderLayout.SOUTH);
             }
-            //playerPanels[i].setPreferredSize(new Dimension(2*DEFAULT_CARD_WIDTH,DEFAULT_CARD_HEIGHT+130));
+
             topPanel.add(playerPanels[i], new GridBagConstraints());
         }
 
@@ -1106,8 +1116,7 @@ public class TexasHoldem {
     }
 
     // Returns the string name of a hand based on the rank passed
-    private String getHand(int rank)
-    {
+    private String getHand(int rank) {
         String hand;
         switch (rank) {
             case 10:
@@ -1145,8 +1154,7 @@ public class TexasHoldem {
     }
 
     // Reset variables needed to begin the next round
-    private void refreshGame()
-    {
+    private void refreshGame() {
         amountToCall = 20;
         numUsersCalled = 0;
         numUsersFolded = 0;
