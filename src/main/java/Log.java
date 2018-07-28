@@ -166,7 +166,7 @@ public class Log {
         int round = 1;
         int numWins = 0;
         int totalMoneyWon = 0;
-        if (S.hasNext()) { // not a new/empty file
+        if (S.hasNext()) {
             name = S.nextLine();
             round = Integer.valueOf(S.nextLine());
             numWins = Integer.valueOf(S.nextLine());

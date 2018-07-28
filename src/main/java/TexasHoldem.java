@@ -53,8 +53,10 @@ public class TexasHoldem {
 
     // Holds function performed by a player
     public static int playerFunction;
+
     //Holds value player bets
     public static int playerBet;
+
     // Determines whether or not user has selected a button
     public static boolean playerBetStatus = false;
 
@@ -931,7 +933,7 @@ public class TexasHoldem {
                 dealer.addToPot(amountToCall);
 
                 System.out.println(cpuPlayer.getName() + " raised bet to " + amountToCall);
-                textUpdateArea.append(cpuPlayer.getName() + " raises by $" + playerBet + " to " + amountToCall + ".\n");
+                textUpdateArea.append(cpuPlayer.getName() + " raises by $" + betNum + " to " + amountToCall + ".\n");
 
                 numUsersCalled = 1;
                 numRaises++;
