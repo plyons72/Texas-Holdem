@@ -402,9 +402,20 @@ public class TexasHoldem {
         // Dealer is first
         // Small blind should be the first player after dealer
         // Big blind is the second player after dealer
-        Player symbolicDealer = allPlayers.get(0);
-        Player smallBlind = allPlayers.get(1);
-        Player bigBlind = allPlayers.get(2);
+
+        Player symbolicDealer;
+        Player smallBlind;
+        Player bigBlind;
+        if (allPlayers.size() == 2){
+            symbolicDealer = allPlayers.get(0);
+            smallBlind = allPlayers.get(0);
+            bigBlind = allPlayers.get(1);
+        }
+        else{
+            symbolicDealer = allPlayers.get(0);
+            smallBlind = allPlayers.get(1);
+            bigBlind = allPlayers.get(2);
+        }
 
         // Run the game
         while (!endGame) {
@@ -414,9 +425,16 @@ public class TexasHoldem {
                 // Dealer is first
                 // Small blind should be the first player after dealer
                 // Big blind is the second player after dealer
-                symbolicDealer = allPlayers.get(0);
-                smallBlind = allPlayers.get(1);
-                bigBlind = allPlayers.get(2);
+                if (allPlayers.size() == 2){
+                    symbolicDealer = allPlayers.get(0);
+                    smallBlind = allPlayers.get(0);
+                    bigBlind = allPlayers.get(1);
+                }
+                else{
+                    symbolicDealer = allPlayers.get(0);
+                    smallBlind = allPlayers.get(1);
+                    bigBlind = allPlayers.get(2);
+                }
 
                 // Remove the blinds from the small and big blind and set these as bets for them to call against later
                 smallBlind.removeBetAmount(10);
@@ -442,7 +460,16 @@ public class TexasHoldem {
                 Player curPlayer;
 
                 // Lower index to get dealer, small blind, and big blind real bet
-                if (i >= allPlayers.size()) {
+                if(allPlayers.size() == 2)
+                {
+                    if(i == 3) {
+                        curPlayer = allPlayers.get(0);
+                    }
+                    else{
+                        curPlayer = allPlayers.get(1);
+                    }
+                }
+                else if (i >= allPlayers.size()) {
                     int j = i - allPlayers.size();
                     curPlayer = allPlayers.get(j);
                 } else {
@@ -482,7 +509,7 @@ public class TexasHoldem {
                     // Check if player has not bet enough yet
                     if (curPlayer.getBet() < amountToCall) {
 
-                        // Seperate out player from cpu
+                        // Separate out player from cpu
                         if (curPlayer == player) {
                             // Update the raise/call field with the amount needed to call
                             raiseField = new JTextField(Integer.toString(amountToCall - curPlayer.getBet()), 6);
