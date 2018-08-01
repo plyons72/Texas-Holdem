@@ -847,18 +847,18 @@ public class TexasHoldem {
         if(cpuPlayer.getStyle() == 1){
 
             // If there have been 3 raises, don't let the cpu raise again
-            if (numRaises >= 3 && cpuFunction <= 3) {
-                cpuFunction = rand.nextInt(7) + 4;
+            if (numRaises >= 3 && cpuFunction <= 1) {
+                cpuFunction = rand.nextInt(9) + 2;
                 System.out.printf("\nnumRaises is 3. Changed CPU function from 1 to %d\n", cpuFunction);
             }
 
             // If the cpu has more cash than the amount needed to call, allows the cpu to raise
-            // CPU can raise the pot by a total of a sixteenth of their max earnings
+            // CPU can raise the pot by a total of an eighth of their max earnings
             // Else, if the cpu is set to raise, changes that to a different function, randomly
-            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 16); }
+            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 8); }
 
             else {
-                if (cpuFunction <= 3) { cpuFunction = rand.nextInt(7) + 4; }
+                if (cpuFunction <= 1) { cpuFunction = rand.nextInt(9) + 2; }
             }
 
             switch (cpuFunction) {
@@ -933,8 +933,8 @@ public class TexasHoldem {
         else if(cpuPlayer.getStyle() == 2){
 
             // If there have been 3 raises, don't let the cpu raise again
-            if (numRaises >= 3 && cpuFunction <= 3) {
-                cpuFunction = rand.nextInt(7) + 4;
+            if (numRaises >= 3 && cpuFunction <= 1) {
+                cpuFunction = rand.nextInt(9) + 2;
                 System.out.printf("\nnumRaises is 3. Changed CPU function from 1 to %d\n", cpuFunction);
             }
 
@@ -944,15 +944,13 @@ public class TexasHoldem {
             if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 8); }
 
             else {
-                if (cpuFunction <= 3) { cpuFunction = rand.nextInt(7) + 4; }
+                if (cpuFunction <= 1) { cpuFunction = rand.nextInt(9) + 2; }
             }
 
             switch (cpuFunction) {
 
             // Raise
             case 1:
-            case 2:
-            case 3:
                 //
                 int betNum = rand.nextInt(betRange) + 1;
 
@@ -973,6 +971,8 @@ public class TexasHoldem {
                 break;
 
             // Call
+            case 2:
+            case 3:
             case 4:
             case 5:
             case 6:
@@ -1019,18 +1019,18 @@ public class TexasHoldem {
         else if(cpuPlayer.getStyle() == 3){
 
             // If there have been 3 raises, don't let the cpu raise again
-            if (numRaises >= 3 && cpuFunction <= 4) {
-                cpuFunction = rand.nextInt(6) + 5;
+            if (numRaises >= 3 && cpuFunction <= 2) {
+                cpuFunction = rand.nextInt(8) + 3;
                 System.out.printf("\nnumRaises is 3. Changed CPU function from 1 to %d\n", cpuFunction);
             }
 
             // If the cpu has more cash than the amount needed to call, allows the cpu to raise
-            // CPU can raise the pot by a total of a sixteenth of their max earnings
+            // CPU can raise the pot by a total of an eigth of their max earnings
             // Else, if the cpu is set to raise, changes that to a different function, randomly
-            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 16); }
+            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 8); }
 
             else {
-                if (cpuFunction <= 4) { cpuFunction = rand.nextInt(6) + 5; }
+                if (cpuFunction <= 2) { cpuFunction = rand.nextInt(8) + 3; }
             }
 
             switch (cpuFunction) {
@@ -1038,8 +1038,6 @@ public class TexasHoldem {
             // Raise
             case 1:
             case 2:
-            case 3:
-            case 4:
                 //
                 int betNum = rand.nextInt(betRange) + 1;
 
@@ -1060,6 +1058,8 @@ public class TexasHoldem {
                 break;
 
             // Call
+            case 3:
+            case 4:
             case 5:
             case 6:
             case 7:
@@ -1105,8 +1105,8 @@ public class TexasHoldem {
         else{
 
             // If there have been 3 raises, don't let the cpu raise again
-            if (numRaises >= 3 && cpuFunction <= 4) {
-                cpuFunction = rand.nextInt(6) + 5;
+            if (numRaises >= 3 && cpuFunction <= 2) {
+                cpuFunction = rand.nextInt(8) + 3;
                 System.out.printf("\nnumRaises is 3. Changed CPU function from 1 to %d\n", cpuFunction);
             }
 
@@ -1116,7 +1116,7 @@ public class TexasHoldem {
             if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 8); }
 
             else {
-                if (cpuFunction <= 4) { cpuFunction = rand.nextInt(6) + 5; }
+                if (cpuFunction <= 2) { cpuFunction = rand.nextInt(8) + 3; }
             }
 
             switch (cpuFunction) {
@@ -1124,8 +1124,6 @@ public class TexasHoldem {
             // Raise
             case 1:
             case 2:
-            case 3:
-            case 4:
                 //
                 int betNum = rand.nextInt(betRange) + 1;
 
@@ -1146,6 +1144,8 @@ public class TexasHoldem {
                 break;
 
             // Call
+            case 3:
+            case 4:
             case 5:
             case 6:
             case 7:
