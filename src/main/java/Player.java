@@ -13,16 +13,18 @@ public class Player
     private final String playerName;
     private boolean playerIn;
     private int playerBet;
+    private int playerStyle;
 
     // Create a player object with their name, amount, and starting cards
-    public Player(String name, int amount, int[] cards, boolean in, int rank, int bet)
+    public Player(String name, int amount, int[] cards, boolean in, int rank, int bet, int style)
     {
         playerName = name;
         playerMoney = amount;
         playerCards = cards;
         playerIn = in;
         playerRank = rank;
-        playerBet = bet;
+        playerStyle = style;
+
 
     }
 
@@ -67,4 +69,11 @@ public class Player
 
     //Gets the num a player has bet this round
     public int getBet() { return playerBet; }
+
+    //Sets the betting style a player has
+    public void setStyle(int style) {
+        playerStyle = style; }
+
+    //Gets the player's betting style
+    public int getStyle() { return playerStyle; }
 }
