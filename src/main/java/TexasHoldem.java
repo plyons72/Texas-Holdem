@@ -853,9 +853,9 @@ public class TexasHoldem {
             }
 
             // If the cpu has more cash than the amount needed to call, allows the cpu to raise
-            // CPU can raise the pot by a total of an eighth of their max earnings
+            // CPU can raise the pot by a total of a sixteenth of their max earnings
             // Else, if the cpu is set to raise, changes that to a different function, randomly
-            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 8); }
+            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 16); }
 
             else {
                 if (cpuFunction <= 3) { cpuFunction = rand.nextInt(7) + 4; }
@@ -939,9 +939,9 @@ public class TexasHoldem {
             }
 
             // If the cpu has more cash than the amount needed to call, allows the cpu to raise
-            // CPU can raise the pot by a total of a quarter of their max earnings
+            // CPU can raise the pot by a total of an eighth of their max earnings
             // Else, if the cpu is set to raise, changes that to a different function, randomly
-            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 4); }
+            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 8); }
 
             else {
                 if (cpuFunction <= 3) { cpuFunction = rand.nextInt(7) + 4; }
@@ -1025,9 +1025,9 @@ public class TexasHoldem {
             }
 
             // If the cpu has more cash than the amount needed to call, allows the cpu to raise
-            // CPU can raise the pot by a total of an eighth of their max earnings
+            // CPU can raise the pot by a total of a sixteenth of their max earnings
             // Else, if the cpu is set to raise, changes that to a different function, randomly
-            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 8); }
+            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 16); }
 
             else {
                 if (cpuFunction <= 4) { cpuFunction = rand.nextInt(6) + 5; }
@@ -1111,9 +1111,9 @@ public class TexasHoldem {
             }
 
             // If the cpu has more cash than the amount needed to call, allows the cpu to raise
-            // CPU can raise the pot by a total of a quarter of their max earnings
+            // CPU can raise the pot by a total of an eigth of their max earnings
             // Else, if the cpu is set to raise, changes that to a different function, randomly
-            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 4); }
+            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 8); }
 
             else {
                 if (cpuFunction <= 4) { cpuFunction = rand.nextInt(6) + 5; }
