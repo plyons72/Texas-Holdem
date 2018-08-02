@@ -5,13 +5,16 @@ Alex McMullen
 Gary Xu
  */
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Random;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
-import javax.swing.*;
 
 
 public class TexasHoldem {
@@ -66,6 +69,11 @@ public class TexasHoldem {
     private static Player player;
     private static Player[] cpuPlayer;
     private static Dealer dealer;
+
+    private static int sidePotAmount;
+    private static int sidePotEachPlayer;
+    private static LinkedList<Player> playersInSidePot = new LinkedList<>();
+    private static boolean sidePotStatus;
 
     // Array to hold the indexes of CPU players who are still in the game
     private static ArrayList<Integer> validCPUs = new ArrayList<Integer>();
@@ -474,6 +482,31 @@ public class TexasHoldem {
 
             System.out.println("\n\n\n\n********************BETTING INTERVAL OVER********************");
 
+            sidePotStatus = false;
+            for (Player p : allPlayers) {
+                // player doing all in
+                if (p.getIn() && p.getBet() == p.getMoney()) {
+                    sidePotEachPlayer = p.getBet();
+                    sidePotStatus = true;
+                    System.out.println("*****************Side pot is on*****************");
+                } else { // not all in, add
+                    if (p.getIn()) {
+                        playersInSidePot.add(p);
+                    }
+                }
+
+                if (player.getBet() == player.getMoney()) {
+                    sidePotEachPlayer = player.getBet();
+                    sidePotStatus = true;
+                } else {
+                    playersInSidePot.add(player);
+                }
+
+            }
+
+
+
+
             // Check if we revealed flop, if not, reveal, and set var to true
             if (!flopSet) {
                 System.out.println("********************SETTING FLOP********************");
@@ -503,6 +536,31 @@ public class TexasHoldem {
                 for (int i = 0; i < validCPUs.size(); i++)
                 {
                     cpuFoldStatus[i] = cpuPlayer[validCPUs.get(i)].getIn();
+                }
+
+                // if there is a side pot
+                if(sidePotStatus){
+                    sidePotAmount = sidePotEachPlayer*playersInSidePot.size();
+                    dealer.setWinnings(dealer.getWinnings()-sidePotAmount);
+                    for (int i = 0; i < playersInSidePot.size(); i++) {
+                        dealer.determineRank(playersInSidePot.get(i));
+                    }
+                    Player sidePotWinner = playersInSidePot.get(0);
+                    for(int i = 0; i < playersInSidePot.size(); i++){
+                        if(playersInSidePot.get(i).getRank()>sidePotWinner.getRank()){
+                            sidePotWinner = playersInSidePot.get(i);
+                        }
+                    }
+
+                    sidePotWinner.increaseWinnings(sidePotAmount);
+
+                    // clean side pot
+                    sidePotAmount = 0;
+                    sidePotStatus = false;
+                    sidePotEachPlayer = 0;
+                    playersInSidePot.clear();
+
+
                 }
 
                 // Show all the CPU cards

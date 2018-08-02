@@ -12,3 +12,4 @@ gradle-app.setting
 /out/
 /src/.DS_Store
 Texas_Holdem_log.txt
+/src/main/java/main.iml
