@@ -533,25 +533,24 @@ public class TexasHoldem {
                 textUpdateArea.append("\nThe dealer reveals the river.\n");
                 revealRiver(middlePanel, sharedDeck);
 
-                for (int i = 0; i < validCPUs.size(); i++)
-                {
+                for (int i = 0; i < validCPUs.size(); i++) {
                     cpuFoldStatus[i] = cpuPlayer[validCPUs.get(i)].getIn();
                 }
 
                 // if there is a side pot
-                if(sidePotStatus){
-                    sidePotAmount = sidePotEachPlayer*playersInSidePot.size();
-                    dealer.setWinnings(dealer.getWinnings()-sidePotAmount);
+                if (sidePotStatus) {
+                    sidePotAmount = sidePotEachPlayer * playersInSidePot.size();
+                    dealer.setWinnings(dealer.getWinnings() - sidePotAmount);
                     for (int i = 0; i < playersInSidePot.size(); i++) {
                         dealer.determineRank(playersInSidePot.get(i));
                     }
                     Player sidePotWinner = playersInSidePot.get(0);
-                    for(int i = 0; i < playersInSidePot.size(); i++){
-                        if(playersInSidePot.get(i).getRank()>sidePotWinner.getRank()){
+                    for (int i = 0; i < playersInSidePot.size(); i++) {
+                        if (playersInSidePot.get(i).getRank() > sidePotWinner.getRank()) {
                             sidePotWinner = playersInSidePot.get(i);
                         }
                     }
-                    drawBottomPanel(bottomPanel,raiseField,raiseButton,callButton,foldButton,potMoneyLabel,timerLabel);
+                    drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel, timerLabel);
                     sidePotWinner.increaseWinnings(sidePotAmount);
 
                     // clean side pot
@@ -572,80 +571,99 @@ public class TexasHoldem {
 
                 // Adds all players who are still in the game to a linked list of player objects to easily determine winner
                 for (int i = 0; i < validCPUs.size(); i++) {
-                    if (i == validCPUs.size()) {
-                        if (player.getIn()) {
+                    //if (i == validCPUs.size()) {
+                        /*if (player.getIn()) {
                             finalPlayers.add(player);
-                        } else {
-                            if (cpuPlayer[validCPUs.get(i)].getIn()) {
-                                finalPlayers.add(cpuPlayer[validCPUs.get(i)]);
-                            }
-                        }
+                        } else {*/
+                    if (cpuPlayer[validCPUs.get(i)].getIn()) {
+                        finalPlayers.add(cpuPlayer[validCPUs.get(i)]);
+                        System.out.println(cpuPlayer[validCPUs.get(i)].getName()+" is added to finalPlayers");
                     }
+                    //}
+                    //}
                 }
+                if (player.getIn())
+                {
+                    finalPlayers.add(player);
+                    System.out.println(player.getName()+" is added to finalPlayers");
+                }
+
 
                 for (int i = 0; i < finalPlayers.size(); i++) {
                     dealer.determineRank(finalPlayers.get(i));
                 }
 
-                int winnerRank = 0;
-                int winnerHigh = 0;
-                ArrayList<Integer> winnerIndex = new ArrayList<Integer>();
-                winnerIndex.add(0);
+                if(finalPlayers.size() != 1) {
+                    int winnerRank = 0;
+                    int winnerHigh = 0;
+                    ArrayList<Integer> winnerIndex = new ArrayList<Integer>();
+                    winnerIndex.add(0);
 
-                // Cycles through and determines the winner
-                for (int i = 0; i < finalPlayers.size(); i++) {
+                    // Cycles through and determines the winner
+                    for (int i = 0; i < finalPlayers.size(); i++) {
 
 
-                    Player curPlayer = finalPlayers.get(i);
-                    int tempRank = curPlayer.getRank();
+                        Player curPlayer = finalPlayers.get(i);
+                        int tempRank = curPlayer.getRank();
 
-                    // Stores values of cards and checks higher one
-                    int a = ((curPlayer.getCards()[0] - 1) % 13);
-                    int b = ((curPlayer.getCards()[1] - 1) % 13);
+                        // Stores values of cards and checks higher one
+                        int a = ((curPlayer.getCards()[0] - 1) % 13);
+                        int b = ((curPlayer.getCards()[1] - 1) % 13);
 
-                    // Stores either a or b as the higher card
-                    int tempHigh = (a > b) ? a : b;
+                        // Stores either a or b as the higher card
+                        int tempHigh = (a > b) ? a : b;
 
-                    String tempName = curPlayer.getName();
+                        String tempName = curPlayer.getName();
 
-                    // If there is a clear better hand, set that
-                    if (tempRank > winnerRank) {
-                        winnerIndex.clear();
-                        winnerIndex.add(i);
-                        winnerRank = tempRank;
-                        winnerHigh= tempHigh;
-                    }
-
-                    // If there is a tie, add to winner rank. check for real tie later
-                    if (tempRank == winnerRank) {
-                        // This user has a higher high card
-                        if (tempHigh > winnerHigh)
-                        {
+                        // If there is a clear better hand, set that
+                        if (tempRank > winnerRank) {
                             winnerIndex.clear();
                             winnerIndex.add(i);
+                            winnerRank = tempRank;
                             winnerHigh = tempHigh;
                         }
 
-                        // High cards match, true tie
-                        else if (tempHigh == winnerHigh) { winnerIndex.add(i); }
+                        // If there is a tie, add to winner rank. check for real tie later
+                        if (tempRank == winnerRank) {
+                            // This user has a higher high card
+                            if (tempHigh > winnerHigh) {
+                                winnerIndex.clear();
+                                winnerIndex.add(i);
+                                winnerHigh = tempHigh;
+                            }
 
-                        // No tie, just continue
-                        else {
+                            // High cards match, true tie
+                            else if (tempHigh == winnerHigh) {
+                                winnerIndex.add(i);
+                            }
+
+                            // No tie, just continue
+                            else {
+
+                            }
 
                         }
 
                     }
 
-                }
+                    int winnings = dealer.getWinnings() / winnerIndex.size();
+                    String winningHand = getHand(winnerRank);
+                    System.out.println("finalPlayers.size() = " + finalPlayers.size());
+                    System.out.println("winnerIndex.size() = " + winnerIndex.size());
+                    System.out.println("winnerIndex.get(0) = " + winnerIndex.get(0));
+                    textUpdateArea.append(finalPlayers.get(winnerIndex.get(0)).getName() + " won $" + winnings + " with " + winningHand + "!\n");
 
-                int winnings = dealer.getWinnings() / winnerIndex.size();
-                String winningHand = getHand(winnerRank);
+                    // Split winnings evenly
+                    for (int i = 0; i < winnerIndex.size(); i++) {
+                        finalPlayers.get(winnerIndex.get(i)).increaseWinnings(winnings);
+                    }
 
-                textUpdateArea.append(finalPlayers.get(winnerIndex.get(0)).getName() + " won $" + winnings + " with " + winningHand + "!\n");
+                } else {
+                    // if there is only 1 player left
+                    // give the all money in pot to the player
+                    finalPlayers.get(0).increaseWinnings(dealer.getWinnings());
+                    System.out.println(finalPlayers.get(0)+" gets all the money of $"+dealer.getWinnings());
 
-                // Split winnings evenly
-                for (int i = 0; i < winnerIndex.size(); i++) {
-                    finalPlayers.get(winnerIndex.get(i)).increaseWinnings(winnings);
                 }
 
                 // Set pot to 0
@@ -722,6 +740,10 @@ public class TexasHoldem {
             for (int i = 0; i < allPlayers.size(); i++) {
                 allPlayers.get(i).setBet(0);
                 amountToCall = 0;
+                // player should be IN in the next round if they still have money
+                if(allPlayers.get(i).getMoney()>0){
+                    allPlayers.get(i).setIn(true);
+                }
             }
 
         }
