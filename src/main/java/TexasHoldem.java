@@ -170,9 +170,9 @@ public class TexasHoldem {
         for (int i = 0; i < numCPUs; i++) {
             validCPUs.add(i);
         }
-      
+
         cpuPlayer = randomStyles(cpuPlayer);
-      
+
         TexasHoldem texasHoldem = new TexasHoldem(deck);
         // Set player styles
     }
@@ -688,18 +688,8 @@ public class TexasHoldem {
                         // Stores either a or b as the higher card
                         int tempHigh = (a > b) ? a : b;
 
-                    // If there is a clear better hand, set that
-                    if (tempRank > winnerRank) {
-                        winnerIndex.clear();
-                        winnerIndex.add(i);
-                        winnerRank = tempRank;
-                        winnerHigh = tempHigh;
-                    }
-
-                    // If there is a tie, add to winner rank. check for real tie later
-                    if (tempRank == winnerRank) {
-                        // This user has a higher high card
-                        if (tempHigh > winnerHigh) {
+                        // If there is a clear better hand, set that
+                        if (tempRank > winnerRank) {
                             winnerIndex.clear();
                             winnerIndex.add(i);
                             winnerRank = tempRank;
@@ -712,33 +702,44 @@ public class TexasHoldem {
                             if (tempHigh > winnerHigh) {
                                 winnerIndex.clear();
                                 winnerIndex.add(i);
+                                winnerRank = tempRank;
                                 winnerHigh = tempHigh;
                             }
 
-                            // High cards match, true tie
-                            else if (tempHigh == winnerHigh) {
-                                winnerIndex.add(i);
-                            }
+                            // If there is a tie, add to winner rank. check for real tie later
+                            if (tempRank == winnerRank) {
+                                // This user has a higher high card
+                                if (tempHigh > winnerHigh) {
+                                    winnerIndex.clear();
+                                    winnerIndex.add(i);
+                                    winnerHigh = tempHigh;
+                                }
 
-                            // No tie, just continue
-                            else {
+                                // High cards match, true tie
+                                else if (tempHigh == winnerHigh) {
+                                    winnerIndex.add(i);
+                                }
 
+                                // No tie, just continue
+                                else {
+
+                                }
                             }
                         }
+
+                        int winnings = dealer.getWinnings() / winnerIndex.size();
+                        String winningHand = getHand(winnerRank);
+                        System.out.println("finalPlayers.size() = " + finalPlayers.size());
+                        System.out.println("winnerIndex.size() = " + winnerIndex.size());
+                        System.out.println("winnerIndex.get(0) = " + winnerIndex.get(0));
+                        textUpdateArea.append(finalPlayers.get(winnerIndex.get(0)).getName() + " won $" + winnings + " with " + winningHand + "!\n");
+
+                        // Split winnings evenly
+                        for (Integer aWinnerIndex : winnerIndex) {
+                            finalPlayers.get(aWinnerIndex).increaseWinnings(winnings);
+                        }
+
                     }
-
-                    int winnings = dealer.getWinnings() / winnerIndex.size();
-                    String winningHand = getHand(winnerRank);
-                    System.out.println("finalPlayers.size() = " + finalPlayers.size());
-                    System.out.println("winnerIndex.size() = " + winnerIndex.size());
-                    System.out.println("winnerIndex.get(0) = " + winnerIndex.get(0));
-                    textUpdateArea.append(finalPlayers.get(winnerIndex.get(0)).getName() + " won $" + winnings + " with " + winningHand + "!\n");
-
-                    // Split winnings evenly
-                    for (int i = 0; i < winnerIndex.size(); i++) {
-                        finalPlayers.get(winnerIndex.get(i)).increaseWinnings(winnings);
-                    }
-
                 } else {
                     // if there is only 1 player left
                     // give the all money in pot to the player
