@@ -58,6 +58,8 @@ public class TexasHoldem {
     // Determines whether or not user has selected a button
     public static boolean playerBetStatus = false;
 
+    public static JPanel sharedDeckPanel = new JPanel();
+
     // For GUI card size
     private static int cardWidth;
     private static int cardHeight;
@@ -405,7 +407,6 @@ public class TexasHoldem {
 
             }
 
-
             // Cycles through each players turn, starting with the player right after the big blind, and ending with the big blind
             for(int i = 3; i < allPlayers.size() + 3; i++) {
                 Player curPlayer;
@@ -590,6 +591,17 @@ public class TexasHoldem {
                     finalPlayers.get(winnerIndex.get(i)).increaseWinnings(winnings);
                 }
 
+                //hilighting the winning cards
+                sharedDeckPanel.setBorder(BorderFactory.createLineBorder(Color.blue));
+                sharedDeckPanel.setBorder(BorderFactory.createLineBorder(Color.blue));
+
+                //alert to stop gameplay until the user presses a button to continue their turn
+                JOptionPane.showMessageDialog(null, "Click OK to play the next hand.");
+
+                //clear the winning card hilight now that new round is starting
+                sharedDeckPanel.setBorder(null);
+                sharedDeckPanel.setBorder(null);
+
                 // Set pot to 0
                 dealer.refreshPot();
 
@@ -656,9 +668,6 @@ public class TexasHoldem {
                 raiseField = new JTextField("0", 6);
                 drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel, timerLabel);
                 windowFrame.repaint();
-
-                //@TODO: Add in an alert here to stop gameplay until the user presses a button to continue their turn
-                JOptionPane.showMessageDialog(null, "Click OK to play the next hand.");
 
             }
 
@@ -1261,7 +1270,6 @@ public class TexasHoldem {
         middlePanel.setPreferredSize(new Dimension(WINDOW_WIDTH,250));
         middlePanel.setBackground(Color.decode(BACKGROUND_COLOR));
         middlePanel.setLayout(new GridBagLayout());
-        JPanel sharedDeckPanel = new JPanel();
         JPanel textUpdatePanel = new JPanel();
         JScrollPane scrollPane = new JScrollPane(textUpdatePanel);
         scrollPane.setMinimumSize(new Dimension(280, 120));
