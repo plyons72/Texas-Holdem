@@ -12,12 +12,11 @@ import java.util.List;
 public class Deck {
 
     //The list is the implementation of the deck object
-    public LinkedList<Integer> deck = new LinkedList<Integer>();
-    public LinkedList<Integer> inUse = new LinkedList<Integer>();
+    public LinkedList < Integer > deck = new LinkedList < Integer > ();
+    public LinkedList < Integer > inUse = new LinkedList < Integer > ();
     public Deck() {
         //building the ordered deck
-        for(int i=1;i<=52;i++)
-        {
+        for (int i = 1; i <= 52; i++) {
             deck.add(i);
         }
         //shuffling the list of cards
@@ -25,8 +24,7 @@ public class Deck {
     }
 
     //Deals a single card to the caller and removes it from the deck
-    public Integer dealCard()
-    {
+    public Integer dealCard() {
         Integer temp = deck.getFirst();
         //Keeping track of what cards we've dealt
         inUse.add(deck.getFirst());
@@ -35,12 +33,10 @@ public class Deck {
     }
 
     //Shuffles an already created Deck Object
-    public void reShuffle()
-    {
+    public void reShuffle() {
         int temp = inUse.size();
         //Adding dealt cards back to the deck
-        for(int i=0; i<temp;i++)
-        {
+        for (int i = 0; i < temp; i++) {
             deck.add(inUse.get(0));
             inUse.remove(0);
         }
