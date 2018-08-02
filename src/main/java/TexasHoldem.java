@@ -658,6 +658,8 @@ public class TexasHoldem {
                 windowFrame.repaint();
 
                 //@TODO: Add in an alert here to stop gameplay until the user presses a button to continue their turn
+                JOptionPane.showMessageDialog(null, "Click OK to play the next hand.");
+
             }
 
             // Reset the amount bet this round
@@ -689,6 +691,11 @@ public class TexasHoldem {
         System.out.println("numraises is " + numRaises);
 
         int callDifference = amountToCall - player.getBet();
+
+        //change button to "check" if need be
+        if(callDifference == 0){
+            callButton.setText("Check");
+        }
 
         //this should check if the play is in too
         if(timeEnabled){
@@ -811,6 +818,9 @@ public class TexasHoldem {
                 numUsersFolded++;
                 break;
         }
+
+        // Change the button back to "call" when done betting
+        callButton.setText("Call");
 
         // Set back to false before exiting, to allow future bets
         playerBetStatus = false;
