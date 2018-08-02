@@ -32,6 +32,10 @@ public class Dealer {
     // Gets the amount in the pot
     public int getWinnings() { return potValue; }
 
+    public void setWinnings(int amount){
+        potValue = amount;
+    }
+
     // Gets the cards the dealer has
     public int[] getFTR() { return ftr; }
 

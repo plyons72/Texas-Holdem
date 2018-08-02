@@ -22,10 +22,9 @@ public class Player
         playerMoney = amount;
         playerCards = cards;
         playerIn = in;
+        playerBet = 0;
         playerRank = rank;
         playerStyle = style;
-
-
     }
 
     // Return the name of a player
