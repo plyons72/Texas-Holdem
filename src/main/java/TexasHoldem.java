@@ -718,6 +718,7 @@ public class TexasHoldem {
                 for (int i = 0; i < 5; i++)
                     ftr[i] = deck.dealCard();
                 dealer.setFTR(ftr);
+                sharedDeck = dealer.getFTR();
 
                 Player[] updatedCPU = new Player[validCPUs.size()];
 
