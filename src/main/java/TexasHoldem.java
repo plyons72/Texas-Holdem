@@ -402,38 +402,30 @@ public class TexasHoldem {
         // Dealer is first
         // Small blind should be the first player after dealer
         // Big blind is the second player after dealer
-
-        Player symbolicDealer;
-        Player smallBlind;
-        Player bigBlind;
-        if (allPlayers.size() == 2){
-            symbolicDealer = allPlayers.get(0);
-            smallBlind = allPlayers.get(0);
-            bigBlind = allPlayers.get(1);
-        }
-        else{
-            symbolicDealer = allPlayers.get(0);
-            smallBlind = allPlayers.get(1);
-            bigBlind = allPlayers.get(2);
-        }
+        Player symbolicDealer = null;
+        Player smallBlind = null;
+        Player bigBlind = null;
 
         // Run the game
         while (!endGame) {
 
             // Skip over this if we are just in the next betting interval
             if (newGame) {
-                // Dealer is first
-                // Small blind should be the first player after dealer
-                // Big blind is the second player after dealer
-                if (allPlayers.size() == 2){
-                    symbolicDealer = allPlayers.get(0);
-                    smallBlind = allPlayers.get(0);
-                    bigBlind = allPlayers.get(1);
-                }
-                else{
+
+                flopSet = false;
+                turnSet = false;
+                newGame = true;
+
+                if (allPlayers.size() > 2) {
                     symbolicDealer = allPlayers.get(0);
                     smallBlind = allPlayers.get(1);
                     bigBlind = allPlayers.get(2);
+                }
+                else {
+                    // Symbolic Dealer == Big Blind if only 2 players
+                    symbolicDealer = allPlayers.get(1);
+                    smallBlind = allPlayers.get(0);
+                    bigBlind = allPlayers.get(1);
                 }
 
                 // Remove the blinds from the small and big blind and set these as bets for them to call against later
@@ -445,61 +437,77 @@ public class TexasHoldem {
 
                 amountToCall = 20;
 
-                System.out.printf("\n\n%s is the dealer", symbolicDealer.getName());
-                System.out.printf("\n%s is the small blind and bet 10", smallBlind.getName());
-                System.out.printf("\n%s is the big blind and bet 20\n\n\n", bigBlind.getName());
                 textUpdateArea.append(symbolicDealer.getName() + " deals.\n");
                 textUpdateArea.append(smallBlind.getName() + " is the small blind and bet 10.\n");
                 textUpdateArea.append(bigBlind.getName() + " is the big blind and bet 20.\n");
 
             }
 
+            if (allPlayers.size() > 2) {
+                // Cycles through each players turn, starting with the player right after the big blind, and ending with the big blind
+                for(int i = 3; i < allPlayers.size() + 3; i++) {
+                    Player curPlayer;
 
-            // Cycles through each players turn, starting with the player right after the big blind, and ending with the big blind
-            for (int i = 3; i < allPlayers.size() + 3; i++) {
-                Player curPlayer;
+                    // Lower index to get dealer, small blind, and big blind real bet
+                    if (i >= allPlayers.size()) {
+                        int j = i - allPlayers.size();
+                        curPlayer = allPlayers.get(j);
+                    }
+                    else { curPlayer = allPlayers.get(i); }
 
-                // Lower index to get dealer, small blind, and big blind real bet
-                if(allPlayers.size() == 2)
-                {
-                    if(i == 3) {
-                        curPlayer = allPlayers.get(0);
+                    if (curPlayer == player) {
+                        // Make sure user didn't fold
+                        if (curPlayer.getIn()) {
+                            // Update the raise/call field with the amount needed to call
+                            raiseField = new JTextField(Integer.toString(amountToCall - curPlayer.getBet()), 6);
+                            drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel,timerLabel);
+                            windowFrame.repaint();
+                            userBet(raiseButton, raiseField, callButton, foldButton, timeEnabled, timerLabel);
+                        }
                     }
-                    else{
-                        curPlayer = allPlayers.get(1);
+                    else {
+                        // Make sure user didn't fold
+                        if (curPlayer.getIn()) { cpuBet(curPlayer); }
                     }
+
+
+                    // Refresh amount shown in gui pot
+                    setupPotLabel(potMoneyLabel, dealer);
+
                 }
-                else if (i >= allPlayers.size()) {
-                    int j = i - allPlayers.size();
-                    curPlayer = allPlayers.get(j);
-                } else {
-                    curPlayer = allPlayers.get(i);
-                }
-
-                if (curPlayer == player) {
-                    // Make sure user didn't fold
-                    if (curPlayer.getIn()) {
-                        // Update the raise/call field with the amount needed to call
-                        raiseField = new JTextField(Integer.toString(amountToCall - curPlayer.getBet()), 6);
-                        drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel, timerLabel);
-                        windowFrame.repaint();
-                        userBet(raiseButton, raiseField, callButton, foldButton, timeEnabled, timerLabel);
-                    }
-                } else {
-                    // Make sure user didn't fold
-                    if (curPlayer.getIn()) {
-                        cpuBet(curPlayer);
-                    }
-                }
-
-
-                // Refresh amount shown in gui pot
-                setupPotLabel(potMoneyLabel, dealer);
-
             }
 
-            System.out.println("\n\n\n\n\nFinished initial bets. Going through to allow everyone to call\n\n\n\n\n");
+            else {
+                // Cycles through each players turn, starting with the player right after the big blind, and ending with the big blind
+                for(int i = 0; i >= 1; i++) {
+                    Player curPlayer = allPlayers.get(i);
 
+                    if (curPlayer == player) {
+                        // Make sure user didn't fold
+                        if (curPlayer.getIn()) {
+                            // Update the raise/call field with the amount needed to call
+                            raiseField = new JTextField(Integer.toString(amountToCall - curPlayer.getBet()), 6);
+                            drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel,timerLabel);
+                            windowFrame.repaint();
+                            userBet(raiseButton, raiseField, callButton, foldButton, timeEnabled, timerLabel);
+                        }
+
+                        // If we folded, the cpu is the winner
+                        else{ declareWinner(allPlayers.get(1), true); }
+                    }
+                    else {
+                        // Make sure user didn't fold
+                        if (curPlayer.getIn()) { cpuBet(curPlayer); }
+                        // If CPU folded, we win
+                        else { declareWinner(player, true); }
+                    }
+
+                    // Refresh amount shown in gui pot
+                    setupPotLabel(potMoneyLabel, dealer);
+                }
+            }
+
+            // Make sure everyone bets
             for (int i = 0; i < allPlayers.size(); i++) {
                 // Check if player is in
                 if (allPlayers.get(i).getIn()) {
@@ -528,11 +536,8 @@ public class TexasHoldem {
             numUsersCalled = 0;
             numRaises = 0;
 
-            System.out.println("\n\n\n\n********************BETTING INTERVAL OVER********************");
-
             // Check if we revealed flop, if not, reveal, and set var to true
             if (!flopSet) {
-                System.out.println("********************SETTING FLOP********************");
                 textUpdateArea.append("\nThe dealer reveals the flop.\n");
                 revealFlop(middlePanel, sharedDeck);
                 windowFrame.repaint();
@@ -542,7 +547,6 @@ public class TexasHoldem {
 
             // Check if we revealed turn, if not, reveal, and set var to true
             else if (!turnSet) {
-                System.out.println("********************SETTING TURN********************");
                 textUpdateArea.append("\nThe dealer reveals the turn.\n");
                 revealTurn(middlePanel, sharedDeck);
                 windowFrame.repaint();
@@ -552,7 +556,6 @@ public class TexasHoldem {
 
             // Reveal river, check win-con, determine winner, and start game over again
             else {
-                System.out.println("********************SETTING RIVER********************");
                 textUpdateArea.append("\nThe dealer reveals the river.\n");
                 revealRiver(middlePanel, sharedDeck);
 
@@ -626,22 +629,7 @@ public class TexasHoldem {
                         else if (tempHigh == winnerHigh) {
                             winnerIndex.add(i);
                         }
-
-                        // No tie, just continue
-                        else {}
-
                     }
-
-                }
-
-                int winnings = dealer.getWinnings() / winnerIndex.size();
-                String winningHand = getHand(winnerRank);
-
-                textUpdateArea.append(finalPlayers.get(winnerIndex.get(0)).getName() + " won $" + winnings + " with " + winningHand + "!\n");
-
-                // Split winnings evenly
-                for (int i = 0; i < winnerIndex.size(); i++) {
-                    finalPlayers.get(winnerIndex.get(i)).increaseWinnings(winnings);
                 }
 
                 // Set pot to 0
@@ -677,9 +665,7 @@ public class TexasHoldem {
 
                 // Reset game variables for the next round
                 refreshGame();
-                flopSet = false;
-                turnSet = false;
-                newGame = true;
+
 
                 // Reshuffle deck and redistribute cards for next game
                 deck.reShuffle();
@@ -723,11 +709,25 @@ public class TexasHoldem {
 
     }
 
+    public void declareWinner(Player player, boolean winByDefault) {
+        if (!winByDefault) {
+            dealer.determineRank(player);
+            player.increaseWinnings(dealer.getWinnings());
+            textUpdateArea.append(player.getName() + " won $" + dealer.getWinnings() + " with a " + getHand(player.getRank()));
+        }
+
+        else {
+            player.increaseWinnings(dealer.getWinnings());
+            textUpdateArea.append(player.getName() + " won $" + dealer.getWinnings() + " by default!");
+        }
+
+        refreshGame();
+    }
+
     // Runs until a bet has been made and then returns the amount the player bets (or -1 to fold)
     //has to take in the buttons, and the text field
     public static void userBet(JButton raiseButton, JTextField amountOfMoney, JButton callButton, JButton foldButton,
                                boolean timeEnabled, JLabel timerLabel) {
-
         // Get players current pot for reference
         int playerTotal = player.getMoney();
         Timer timer = new Timer();
@@ -902,7 +902,7 @@ public class TexasHoldem {
 
     // Randomly selects the function that a cpu will perform this turn (raise, call, or fold), keeping restrictions
     // (number of raises, cpu's total earnings, etc.) in mind
-    public static void cpuBet(Player cpuPlayer) {
+    public void cpuBet(Player cpuPlayer) {
 
         // Sleep for 3 seconds to slow gameplay down
         try {
