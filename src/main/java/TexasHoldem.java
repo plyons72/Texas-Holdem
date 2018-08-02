@@ -551,7 +551,7 @@ public class TexasHoldem {
                             sidePotWinner = playersInSidePot.get(i);
                         }
                     }
-
+                    drawBottomPanel(bottomPanel,raiseField,raiseButton,callButton,foldButton,potMoneyLabel,timerLabel);
                     sidePotWinner.increaseWinnings(sidePotAmount);
 
                     // clean side pot
@@ -1287,6 +1287,9 @@ public class TexasHoldem {
         buttonsPanel.add(call);
         buttonsPanel.add(fold);
         buttonsPanel.add(pot);
+        if(sidePotStatus){
+            buttonsPanel.add(new JLabel("Side Pot: "+sidePotAmount));
+        }
         buttonsPanel.add(timerLabel);
         buttonsPanel.setBackground(Color.decode(BACKGROUND_COLOR));
 
