@@ -5,13 +5,16 @@ Alex McMullen
 Gary Xu
  */
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Random;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
-import javax.swing.*;
 
 
 public class TexasHoldem {
@@ -68,6 +71,11 @@ public class TexasHoldem {
     private static Player player;
     private static Player[] cpuPlayer;
     private static Dealer dealer;
+
+    private static int sidePotAmount;
+    private static int sidePotEachPlayer;
+    private static LinkedList<Player> playersInSidePot = new LinkedList<>();
+    private static boolean sidePotStatus;
 
     // Array to hold the indexes of CPU players who are still in the game
     private static ArrayList < Integer > validCPUs = new ArrayList < Integer > ();
@@ -139,7 +147,7 @@ public class TexasHoldem {
 
 
         // Creates new player with name username, $1000, starting cards, in status true, rank in game, and bet for this round
-        player = new Player(username, 1000, playerCards, true, 0, 0);
+        player = new Player(username, 1000, playerCards, true, 0, 0, 0);
 
         // Creates array of CPU players
         cpuPlayer = new Player[numCPUs];
@@ -156,15 +164,17 @@ public class TexasHoldem {
             }
 
             //Instantiate cpu object with their name, starting amount, cards, in status true, rank in game, and bet for this round
-            cpuPlayer[i] = new Player(cpuNames[i], 1000, cpuCards, true, 0, 0);
+            cpuPlayer[i] = new Player(cpuNames[i], 1000, cpuCards, true, 0, 0, 0);
         }
 
         for (int i = 0; i < numCPUs; i++) {
             validCPUs.add(i);
         }
-
+      
+        cpuPlayer = randomStyles(cpuPlayer);
+      
         TexasHoldem texasHoldem = new TexasHoldem(deck);
-
+        // Set player styles
     }
 
     // Takes in a number of names to return to the user, and returns a string
@@ -270,8 +280,24 @@ public class TexasHoldem {
         }
 
         return cpuNames;
+    }
+
+    //gives each cpu one of four random betting styles
+ 	private static Player[] randomStyles(Player[] cpuPlayer) {
+
+        // Give each player a random style (out of the 4 we have)
+        for (int i = 0; i < cpuPlayer.length; i++)
+        {
+        	Random rand = new Random();
+       		int cpuStyle = rand.nextInt(4) + 1;
+       		cpuPlayer[i].setStyle(cpuStyle);
+       		System.out.println(cpuPlayer[i].getName() + "'s betting style is: " + cpuPlayer[i].getStyle());
+        }
+
+        return cpuPlayer;
 
     }
+
 
     //takes in a CPU player and returns a JLabel array of their resized cards
     private static JLabel[] getCpuCards(Player cpuPlayer) {
@@ -536,6 +562,30 @@ public class TexasHoldem {
             numUsersCalled = 0;
             numRaises = 0;
 
+            System.out.println("\n\n\n\n********************BETTING INTERVAL OVER********************");
+
+            sidePotStatus = false;
+            for (Player p : allPlayers) {
+                // player doing all in
+                if (p.getIn() && p.getBet() == p.getMoney()) {
+                    sidePotEachPlayer = p.getBet();
+                    sidePotStatus = true;
+                    System.out.println("*****************Side pot is on*****************");
+                } else { // not all in, add
+                    if (p.getIn()) {
+                        playersInSidePot.add(p);
+                    }
+                }
+
+                if (player.getBet() == player.getMoney()) {
+                    sidePotEachPlayer = player.getBet();
+                    sidePotStatus = true;
+                } else {
+                    playersInSidePot.add(player);
+                }
+
+            }
+
             // Check if we revealed flop, if not, reveal, and set var to true
             if (!flopSet) {
                 textUpdateArea.append("\nThe dealer reveals the flop.\n");
@@ -563,6 +613,31 @@ public class TexasHoldem {
                     cpuFoldStatus[i] = cpuPlayer[validCPUs.get(i)].getIn();
                 }
 
+                // if there is a side pot
+                if (sidePotStatus) {
+                    sidePotAmount = sidePotEachPlayer * playersInSidePot.size();
+                    dealer.setWinnings(dealer.getWinnings() - sidePotAmount);
+                    for (int i = 0; i < playersInSidePot.size(); i++) {
+                        dealer.determineRank(playersInSidePot.get(i));
+                    }
+                    Player sidePotWinner = playersInSidePot.get(0);
+                    for (int i = 0; i < playersInSidePot.size(); i++) {
+                        if (playersInSidePot.get(i).getRank() > sidePotWinner.getRank()) {
+                            sidePotWinner = playersInSidePot.get(i);
+                        }
+                    }
+                    drawBottomPanel(bottomPanel, raiseField, raiseButton, callButton, foldButton, potMoneyLabel, timerLabel);
+                    sidePotWinner.increaseWinnings(sidePotAmount);
+
+                    // clean side pot
+                    sidePotAmount = 0;
+                    sidePotStatus = false;
+                    sidePotEachPlayer = 0;
+                    playersInSidePot.clear();
+
+
+                }
+
                 // Show all the CPU cards
                 drawTopPanel(topPanel, true);
                 windowFrame.repaint();
@@ -572,41 +647,46 @@ public class TexasHoldem {
 
                 // Adds all players who are still in the game to a linked list of player objects to easily determine winner
                 for (int i = 0; i < validCPUs.size(); i++) {
-                    if (i == validCPUs.size()) {
-                        if (player.getIn()) {
+                    //if (i == validCPUs.size()) {
+                        /*if (player.getIn()) {
                             finalPlayers.add(player);
-                        } else {
-                            if (cpuPlayer[validCPUs.get(i)].getIn()) {
-                                finalPlayers.add(cpuPlayer[validCPUs.get(i)]);
-                            }
-                        }
+                        } else {*/
+                    if (cpuPlayer[validCPUs.get(i)].getIn()) {
+                        finalPlayers.add(cpuPlayer[validCPUs.get(i)]);
+                        System.out.println(cpuPlayer[validCPUs.get(i)].getName()+" is added to finalPlayers");
                     }
                 }
+                if (player.getIn())
+                {
+                    finalPlayers.add(player);
+                    System.out.println(player.getName()+" is added to finalPlayers");
+                }
+
 
                 for (int i = 0; i < finalPlayers.size(); i++) {
                     dealer.determineRank(finalPlayers.get(i));
                 }
 
-                int winnerRank = 0;
-                int winnerHigh = 0;
-                ArrayList < Integer > winnerIndex = new ArrayList < Integer > ();
-                winnerIndex.add(0);
 
-                // Cycles through and determines the winner
-                for (int i = 0; i < finalPlayers.size(); i++) {
+                if(finalPlayers.size() != 1) {
+                    int winnerRank = 0;
+                    int winnerHigh = 0;
+                    ArrayList<Integer> winnerIndex = new ArrayList<Integer>();
+                    winnerIndex.add(0);
+
+                    // Cycles through and determines the winner
+                    for (int i = 0; i < finalPlayers.size(); i++) {
 
 
-                    Player curPlayer = finalPlayers.get(i);
-                    int tempRank = curPlayer.getRank();
+                        Player curPlayer = finalPlayers.get(i);
+                        int tempRank = curPlayer.getRank();
 
-                    // Stores values of cards and checks higher one
-                    int a = ((curPlayer.getCards()[0] - 1) % 13);
-                    int b = ((curPlayer.getCards()[1] - 1) % 13);
+                        // Stores values of cards and checks higher one
+                        int a = ((curPlayer.getCards()[0] - 1) % 13);
+                        int b = ((curPlayer.getCards()[1] - 1) % 13);
 
-                    // Stores either a or b as the higher card
-                    int tempHigh = (a > b) ? a : b;
-
-                    String tempName = curPlayer.getName();
+                        // Stores either a or b as the higher card
+                        int tempHigh = (a > b) ? a : b;
 
                     // If there is a clear better hand, set that
                     if (tempRank > winnerRank) {
@@ -622,14 +702,49 @@ public class TexasHoldem {
                         if (tempHigh > winnerHigh) {
                             winnerIndex.clear();
                             winnerIndex.add(i);
+                            winnerRank = tempRank;
                             winnerHigh = tempHigh;
                         }
 
-                        // High cards match, true tie
-                        else if (tempHigh == winnerHigh) {
-                            winnerIndex.add(i);
+                        // If there is a tie, add to winner rank. check for real tie later
+                        if (tempRank == winnerRank) {
+                            // This user has a higher high card
+                            if (tempHigh > winnerHigh) {
+                                winnerIndex.clear();
+                                winnerIndex.add(i);
+                                winnerHigh = tempHigh;
+                            }
+
+                            // High cards match, true tie
+                            else if (tempHigh == winnerHigh) {
+                                winnerIndex.add(i);
+                            }
+
+                            // No tie, just continue
+                            else {
+
+                            }
                         }
                     }
+
+                    int winnings = dealer.getWinnings() / winnerIndex.size();
+                    String winningHand = getHand(winnerRank);
+                    System.out.println("finalPlayers.size() = " + finalPlayers.size());
+                    System.out.println("winnerIndex.size() = " + winnerIndex.size());
+                    System.out.println("winnerIndex.get(0) = " + winnerIndex.get(0));
+                    textUpdateArea.append(finalPlayers.get(winnerIndex.get(0)).getName() + " won $" + winnings + " with " + winningHand + "!\n");
+
+                    // Split winnings evenly
+                    for (int i = 0; i < winnerIndex.size(); i++) {
+                        finalPlayers.get(winnerIndex.get(i)).increaseWinnings(winnings);
+                    }
+
+                } else {
+                    // if there is only 1 player left
+                    // give the all money in pot to the player
+                    finalPlayers.get(0).increaseWinnings(dealer.getWinnings());
+                    System.out.println(finalPlayers.get(0)+" gets all the money of $"+dealer.getWinnings());
+
                 }
 
                 // Set pot to 0
@@ -682,6 +797,7 @@ public class TexasHoldem {
                 for (int i = 0; i < 5; i++)
                     ftr[i] = deck.dealCard();
                 dealer.setFTR(ftr);
+                sharedDeck = dealer.getFTR();
 
                 Player[] updatedCPU = new Player[validCPUs.size()];
 
@@ -697,12 +813,18 @@ public class TexasHoldem {
                 windowFrame.repaint();
 
                 //@TODO: Add in an alert here to stop gameplay until the user presses a button to continue their turn
+                JOptionPane.showMessageDialog(null, "Click OK to play the next hand.");
+
             }
 
             // Reset the amount bet this round
             for (int i = 0; i < allPlayers.size(); i++) {
                 allPlayers.get(i).setBet(0);
                 amountToCall = 0;
+                // player should be IN in the next round if they still have money
+                if(allPlayers.get(i).getMoney()>0){
+                    allPlayers.get(i).setIn(true);
+                }
             }
 
         }
@@ -744,6 +866,11 @@ public class TexasHoldem {
         System.out.println("numraises is " + numRaises);
 
         int callDifference = amountToCall - player.getBet();
+
+        //change button to "check" if need be
+        if(callDifference == 0){
+            callButton.setText("Check");
+        }
 
         //this should check if the play is in too
         timer.start();
@@ -895,6 +1022,9 @@ public class TexasHoldem {
                 break;
         }
 
+        // Change the button back to "call" when done betting
+        callButton.setText("Call");
+
         // Set back to false before exiting, to allow future bets
         playerBetStatus = false;
 
@@ -913,7 +1043,7 @@ public class TexasHoldem {
         Random rand = new Random();
 
         // Randomly select the type of turn the cpu will make
-        int cpuFunction = rand.nextInt(3) + 1;
+        int cpuFunction = rand.nextInt(10) + 1;
         int cpuTotal = cpuPlayer.getMoney();
 
 
@@ -925,26 +1055,112 @@ public class TexasHoldem {
         // Holds the range from which to pick the value to raise
         int betRange = 0;
 
+        // won't bet often and won't bet much money
+        if(cpuPlayer.getStyle() == 1){
 
-        // If there have been 3 raises, don't let the cpu raise again
-        if (numRaises >= 3 && cpuFunction == 1) {
-            cpuFunction = rand.nextInt(1) + 2;
-            System.out.printf("\nnumRaises is 3. Changed CPU function from 1 to %d\n", cpuFunction);
-        }
-
-        // If the cpu has more cash than the amount needed to call, allows the cpu to raise
-        // CPU can raise the pot by a total of half of their max earnings
-        // Else, if the cpu is set to raise, changes that to a different function, randomly
-        if (cpuTotal > amountToCall) {
-            betRange = ((cpuTotal - amountToCall) / 4);
-        } else {
-            if (cpuFunction == 1) {
-                cpuFunction = rand.nextInt(1) + 2;
+            // If there have been 3 raises, don't let the cpu raise again
+            if (numRaises >= 3 && cpuFunction <= 1) {
+                cpuFunction = rand.nextInt(9) + 2;
+                System.out.printf("\nnumRaises is 3. Changed CPU function from 1 to %d\n", cpuFunction);
             }
+
+            // If the cpu has more cash than the amount needed to call, allows the cpu to raise
+            // CPU can raise the pot by a total of an eighth of their max earnings
+            // Else, if the cpu is set to raise, changes that to a different function, randomly
+            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 8); }
+
+            else {
+                if (cpuFunction <= 1) { cpuFunction = rand.nextInt(9) + 2; }
+            }
+
+            switch (cpuFunction) {
+
+            // Raise
+            case 1:
+            case 2:
+            case 3:
+                //
+                int betNum = rand.nextInt(betRange) + 1;
+
+                //set that bet to the new required bet
+                amountToCall += betNum;
+
+                // Remove money equal to the call amount and the raised amount
+                cpuPlayer.removeBetAmount(amountToCall);
+
+                // Increase the total pot
+                dealer.addToPot(amountToCall);
+
+                System.out.println(cpuPlayer.getName() + " raised bet to " + amountToCall);
+                textUpdateArea.append(cpuPlayer.getName() + " raises by $" + playerBet + " to " + amountToCall + ".\n");
+
+                numUsersCalled = 1;
+                numRaises++;
+                break;
+
+            // Call
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+
+                // Remove the call amount from the cpu's pool
+                if (cpuTotal >= amountToCall) {
+                    cpuPlayer.removeBetAmount(amountToCall);
+                    System.out.println(cpuPlayer.getName() + " called for  " + amountToCall);
+                    textUpdateArea.append(cpuPlayer.getName() + " called on $" + amountToCall + ".\n");
+                    dealer.addToPot(amountToCall);
+                }
+                // CPU is going all in, but can't actually match the amount called
+                // need to lower the bet per player
+                else {
+                    cpuPlayer.removeBetAmount(cpuTotal);
+                    System.out.println(cpuPlayer.getName() + " is going all in with " + cpuTotal);
+                    textUpdateArea.append(cpuPlayer.getName() + " is all in with $" + cpuTotal + ".\n");
+                    amountToCall = cpuTotal;
+                    dealer.addToPot(amountToCall);
+                }
+
+                numUsersCalled++;
+
+                break;
+
+            // Fold
+            case 9:
+            case 10:
+
+                // Set player to out, set rank to -1, and increase the number of users folded
+                cpuPlayer.setIn(false);
+                cpuPlayer.setRank(-1);
+                System.out.println(cpuPlayer.getName() + " folded");
+                textUpdateArea.append(cpuPlayer.getName() + " folds.\n");
+                numUsersFolded++;
+                break;
+            }
+
         }
 
+        // won't bet often but bets large amounts
+        else if(cpuPlayer.getStyle() == 2){
 
-        switch (cpuFunction) {
+            // If there have been 3 raises, don't let the cpu raise again
+            if (numRaises >= 3 && cpuFunction <= 1) {
+                cpuFunction = rand.nextInt(9) + 2;
+                System.out.printf("\nnumRaises is 3. Changed CPU function from 1 to %d\n", cpuFunction);
+            }
+
+            // If the cpu has more cash than the amount needed to call, allows the cpu to raise
+            // CPU can raise the pot by a total of an eighth of their max earnings
+            // Else, if the cpu is set to raise, changes that to a different function, randomly
+            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 8); }
+
+            else {
+                if (cpuFunction <= 1) { cpuFunction = rand.nextInt(9) + 2; }
+            }
+
+            switch (cpuFunction) {
+
             // Raise
             case 1:
                 //
@@ -968,6 +1184,12 @@ public class TexasHoldem {
 
             // Call
             case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
 
                 // Remove the call amount from the cpu's pool
                 if (cpuTotal >= amountToCall) {
@@ -990,9 +1212,9 @@ public class TexasHoldem {
                 numUsersCalled++;
                 break;
 
-
             // Fold
-            case 3:
+            case 9:
+            case 10:
 
                 // Set player to out, set rank to -1, and increase the number of users folded
                 cpuPlayer.setIn(false);
@@ -1001,6 +1223,180 @@ public class TexasHoldem {
                 textUpdateArea.append(cpuPlayer.getName() + " folds.\n");
                 numUsersFolded++;
                 break;
+            }
+
+        }
+
+        // bets often but won't bet much money
+        else if(cpuPlayer.getStyle() == 3){
+
+            // If there have been 3 raises, don't let the cpu raise again
+            if (numRaises >= 3 && cpuFunction <= 2) {
+                cpuFunction = rand.nextInt(8) + 3;
+                System.out.printf("\nnumRaises is 3. Changed CPU function from 1 to %d\n", cpuFunction);
+            }
+
+            // If the cpu has more cash than the amount needed to call, allows the cpu to raise
+            // CPU can raise the pot by a total of an eigth of their max earnings
+            // Else, if the cpu is set to raise, changes that to a different function, randomly
+            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 8); }
+
+            else {
+                if (cpuFunction <= 2) { cpuFunction = rand.nextInt(8) + 3; }
+            }
+
+            switch (cpuFunction) {
+
+            // Raise
+            case 1:
+            case 2:
+                //
+                int betNum = rand.nextInt(betRange) + 1;
+
+                //set that bet to the new required bet
+                amountToCall += betNum;
+
+                // Remove money equal to the call amount and the raised amount
+                cpuPlayer.removeBetAmount(amountToCall);
+
+                // Increase the total pot
+                dealer.addToPot(amountToCall);
+
+                System.out.println(cpuPlayer.getName() + " raised bet to " + amountToCall);
+                textUpdateArea.append(cpuPlayer.getName() + " raises by $" + playerBet + " to " + amountToCall + ".\n");
+
+                numUsersCalled = 1;
+                numRaises++;
+                break;
+
+            // Call
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+
+                // Remove the call amount from the cpu's pool
+                if (cpuTotal >= amountToCall) {
+                    cpuPlayer.removeBetAmount(amountToCall);
+                    System.out.println(cpuPlayer.getName() + " called for  " + amountToCall);
+                    textUpdateArea.append(cpuPlayer.getName() + " called on $" + amountToCall + ".\n");
+                    dealer.addToPot(amountToCall);
+                }
+                // CPU is going all in, but can't actually match the amount called
+                // need to lower the bet per player
+                else {
+                    cpuPlayer.removeBetAmount(cpuTotal);
+                    System.out.println(cpuPlayer.getName() + " is going all in with " + cpuTotal);
+                    textUpdateArea.append(cpuPlayer.getName() + " is all in with $" + cpuTotal + ".\n");
+                    amountToCall = cpuTotal;
+                    dealer.addToPot(amountToCall);
+                }
+
+                numUsersCalled++;
+
+                break;
+
+            // Fold
+            case 10:
+
+                // Set player to out, set rank to -1, and increase the number of users folded
+                cpuPlayer.setIn(false);
+                cpuPlayer.setRank(-1);
+                System.out.println(cpuPlayer.getName() + " folded");
+                textUpdateArea.append(cpuPlayer.getName() + " folds.\n");
+                numUsersFolded++;
+                break;
+            }
+
+        }
+
+        // bets often and bets large amounts
+        else{
+
+            // If there have been 3 raises, don't let the cpu raise again
+            if (numRaises >= 3 && cpuFunction <= 2) {
+                cpuFunction = rand.nextInt(8) + 3;
+                System.out.printf("\nnumRaises is 3. Changed CPU function from 1 to %d\n", cpuFunction);
+            }
+
+            // If the cpu has more cash than the amount needed to call, allows the cpu to raise
+            // CPU can raise the pot by a total of an eigth of their max earnings
+            // Else, if the cpu is set to raise, changes that to a different function, randomly
+            if(cpuTotal > amountToCall) { betRange = ((cpuTotal - amountToCall) / 8); }
+
+            else {
+                if (cpuFunction <= 2) { cpuFunction = rand.nextInt(8) + 3; }
+            }
+
+            switch (cpuFunction) {
+
+            // Raise
+            case 1:
+            case 2:
+                //
+                int betNum = rand.nextInt(betRange) + 1;
+
+                //set that bet to the new required bet
+                amountToCall += betNum;
+
+                // Remove money equal to the call amount and the raised amount
+                cpuPlayer.removeBetAmount(amountToCall);
+
+                // Increase the total pot
+                dealer.addToPot(amountToCall);
+
+                System.out.println(cpuPlayer.getName() + " raised bet to " + amountToCall);
+                textUpdateArea.append(cpuPlayer.getName() + " raises by $" + playerBet + " to " + amountToCall + ".\n");
+
+                numUsersCalled = 1;
+                numRaises++;
+                break;
+
+            // Call
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+
+                // Remove the call amount from the cpu's pool
+                if (cpuTotal >= amountToCall) {
+                    cpuPlayer.removeBetAmount(amountToCall);
+                    System.out.println(cpuPlayer.getName() + " called for  " + amountToCall);
+                    textUpdateArea.append(cpuPlayer.getName() + " called on $" + amountToCall + ".\n");
+                    dealer.addToPot(amountToCall);
+                }
+                // CPU is going all in, but can't actually match the amount called
+                // need to lower the bet per player
+                else {
+                    cpuPlayer.removeBetAmount(cpuTotal);
+                    System.out.println(cpuPlayer.getName() + " is going all in with " + cpuTotal);
+                    textUpdateArea.append(cpuPlayer.getName() + " is all in with $" + cpuTotal + ".\n");
+                    amountToCall = cpuTotal;
+                    dealer.addToPot(amountToCall);
+                }
+
+                numUsersCalled++;
+
+                break;
+
+            // Fold
+            case 10:
+
+                // Set player to out, set rank to -1, and increase the number of users folded
+                cpuPlayer.setIn(false);
+                cpuPlayer.setRank(-1);
+                System.out.println(cpuPlayer.getName() + " folded");
+                textUpdateArea.append(cpuPlayer.getName() + " folds.\n");
+                numUsersFolded++;
+                break;
+            }
+
         }
 
         System.out.println(cpuPlayer.getName() + " has " + cpuPlayer.getMoney());
@@ -1045,6 +1441,9 @@ public class TexasHoldem {
         buttonsPanel.add(call);
         buttonsPanel.add(fold);
         buttonsPanel.add(pot);
+        if(sidePotStatus){
+            buttonsPanel.add(new JLabel("Side Pot: "+sidePotAmount));
+        }
         buttonsPanel.add(timerLabel);
         buttonsPanel.setBackground(Color.decode(BACKGROUND_COLOR));
 

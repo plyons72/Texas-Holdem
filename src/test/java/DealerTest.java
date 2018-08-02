@@ -16,7 +16,7 @@ public class DealerTest {
         // Test 1: Royal Flush
         boolean passRoyalFlush = false;
         //public Player(String name, int amount, int[] cards, boolean in, int rank)
-        Player player = new Player("TestingPlayer", 1000, new int[]{9,10},true,0, 0);
+        Player player = new Player("TestingPlayer", 1000, new int[]{9,10},true, 0, 0, 0);
         int starting = 1000;
         Dealer testDealer = new Dealer(starting, DealerTest.SAMPLE_CARDS);
         testDealer.determineRank(player);
@@ -25,14 +25,14 @@ public class DealerTest {
 
         // Test 2: Straight Flush
         boolean passStraightFlush;
-        player = new Player("TestingPlayer", 1000, new int[]{4,5},true,0, 0);
+        player = new Player("TestingPlayer", 1000, new int[]{4,5},true, 0, 0, 0);
         testDealer = new Dealer(starting, DealerTest.SAMPLE_CARDS_FOR_STRAIGHT);
         testDealer.determineRank(player);
         passStraightFlush = (player.getRank() == 9);
         System.out.println("passStraightFlush = "+passStraightFlush);
         // Test 3: Four of a kind
         boolean passFourOfAKind;
-        player = new Player("TestingPlayer", 1000, new int[]{40,51},true,0, 0);
+        player = new Player("TestingPlayer", 1000, new int[]{40,51},true, 0, 0, 0);
         testDealer = new Dealer(starting, DealerTest.SAMPLE_CARDS_FOR_FOUR);
         testDealer.determineRank(player);
         passFourOfAKind = (player.getRank() == 8);
